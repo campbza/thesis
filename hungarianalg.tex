@@ -82,10 +82,11 @@ It tells us that each edge must be covered by vertices whose values add up to at
 In the case where we restrict to integers, this says that for an edge $(i,j)$, 
 either $i$ or $j$ must be included in our solution. Moreover, when we've constructed our Hungarian 
 trees, we can use them to construct this dual solution by taking all out-of-tree nodes in $S$ and 
-all in-tree nodes in $T$. It will become clear why this is once we describe the algorithm.\\
-\\
+all in-tree nodes in $T$.\\
 We want our algorithm for maximum cardinality matching to maintain primal dual feasibility at 
-all steps in the computation. We give the following algorithm for this. 
+all steps in the computation. 
+\\
+We give the following algorithm for this. 
 \begin{itemize}
 	\item \underline{\emph{Step 0}} (\emph{Initialization}) Given a bipartite 
 		graph $G=(S,T,E)$. Let our matching $M := \emptyset$. No nodes are labeled.
