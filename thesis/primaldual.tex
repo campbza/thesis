@@ -1,0 +1,97 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{mathtools}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{definition}[2][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{solution}[2][Solution]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\begin{document}
+\title{Duality Theory}
+\author{Zachary Campbell}
+
+\maketitle
+
+Throughout this thesis we will use a powerful concept called 
+\emph{linear-programming duality}. Duality gives us the tools we need to prove that a 
+solution to a given linear program is optimal. An example of duality that may be familiar 
+to the reader is the max-flow min-cut theorem. An instance of the maximum-flow problem can 
+be described as a maximization linear program. We call the minimization linear program for 
+minimum-cut the \emph{dual}. We know from the max-flow min-cut theorem that, given a graph 
+$G$, the optimal solution to both of these problems is in fact the same. Duality theory will 
+help to show us this connection. When discussing dual linear programs, we refer to the 
+original as the ``primal.''
+
+\begin{definition}{}
+	Given a linear program in the form
+	\begin{align}
+		&\text{maximize} &\sum_{j=1}^{n} c_j x_j \\
+		&\text{subject to}
+		&\sum_{j=1}^{n} a_{ij} x_j &\leq b_i \text{ for } i = 1,2,...,m \\
+		x_j &\geq 0 \text{ for } j = 1,2,...,n,
+	\end{align}
+	the dual is 
+	\begin{align}
+		\text{minimize}\; \; \sum_{i=1}^{m} b_i y_i \\
+		\text{subject to}
+		\sum_{i=1}^{m} a_{ij} y_i &\geq c_j \; \; \text{for } j = 1,2,...,n \\
+		y_i &\geq 0 \; \; \text{for } i = 1,2,...,m.
+	\end{align}
+\end{definition}
+
+It is natural to wonder how solutions to these two linear programs relate to each other. 
+It turns out that their optima are always equal. Towards this conclusion, we have the 
+following lemma, which tells us that any feasible solution to the primal linear program 
+has value no greater than that of any feasible solution to the dual. In the following lemma,
+assume that our primal LP is a maximization problem, and thus the dual is a minimization 
+problem.
+
+\begin{lemma}{(Weak-duality)}
+	Let $\mathbf{x}$ be a primal-feasible solution, and let $\mathbf{y}$ be a dual-
+	feasible solution. Then we have
+	\[
+		\sum_{j=1}^{n} c_j x_j \leq \sum_{i=1}^{m} b_i y_i.
+	\]
+\end{lemma}
+
+\begin{proof}{}
+	\begin{align*}
+		\sum_{j=1}^{n} c_j x_j &\leq \sum_{j=1}^{n} \left( \sum_{i=1}^{m} a_{ij} y_i
+		\right) x_j \\
+		&= \sum_{i=1}^{m} \left( a_{ij} x_j \right) y_i \\
+		&\leq \sum_{i=1}^{m} b_i y_i.
+	\end{align*}
+\end{proof}
+
+This lemma gives rise to the idea of a ``gap'' between feasible primal and dual solutions. 
+That is, one may ask, is there a gap between the largest primal solution and the smallest 
+dual solution? This question is answered by the following theorem, which says that if there 
+exists an optimal feasible solution to the primal, then there is no duality gap, which in 
+turn implies (using the lemma) that the optima are in fact equal!
+
+\begin{theorem}{(Strong duality)}
+	If the primal has an optimal solution $\mathbf{x} = (x_1,...,x_n)$, then the dual 
+	also has an optimal solution $\mathbf{y} = (y_1,...,y_m)$, and 
+	\[
+		\sum_i c_j x_j = \sum_i b_i y_i.
+	\]
+\end{theorem}
+
+
+
+\end{document}

@@ -1,0 +1,137 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{mathtools}
+\usepackage{algorithmic, algorithm}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{solution}[2][Solution]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{definition}[2][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+
+
+\begin{document}
+\title{Bipartite Matching}
+\author{Zachary Campbell}
+
+\maketitle
+
+\begin{definition}{(Bipartite graph)}
+	A graph $G = (V, E)$ is \emph{bipartite} if the set of vertices $V$ can be partitioned into 
+	two disjoint and independent sets $A$ and $B$ such that no edge in $E$ has both endpoints in 
+	the same set of the partition.
+\end{definition}
+
+Note that square-grid graphs are bipartite, but triangle-grid graphs are not. 
+
+\begin{definition}{(Matching)}
+	A matching $M\subset E$ is a collection of edges such that every vertex of $V$ is incident 
+	to at most one edge of $M$, i.e. a set of edges in $G$ that do not share vertices.
+\end{definition}
+
+\begin{section}{Maximum cardinality matching problem}
+	In this problem, $G$ is unweighted and our goal is to find a matching $M$ of maximum size.
+	As a start, we want to prove optimality of a matching. To this end, we could find upper 
+	bounds on the size of any matching and hope that the smallest of these upper bounds  is 
+	equal to the size of the largest matching. This is a duality concept that will prove 
+	useful. \\
+	A \emph{vertex cover} is a set $C$ of vertices such that all edges $e$ of $E$ are incident to 
+	at least on vertex of $C$. In other words, there is no edge completely contained in 
+	$V\setminus C$. Any matching $M$ is at most the size of any vertex cover, since any 
+	vertex cover $C$ must contain at least one of the endpoints of each edge in $M$. This 
+	shows \emph{weak duality}. This leads to a theorem:
+
+	\begin{theorem}{}
+		For any bipartite graph $G$, the maximum size of a matching is equal to the minimum size 
+		of a vertex cover on $G$.
+	\end{theorem}
+
+	\begin{definition}{(Alternating path)}
+		An alternating path with respect to a matching $M$ is a path that alternates between 
+		edges in $M$ and edges in $E\setminus M$.
+	\end{definition}
+
+	\begin{definition}{(Augmenting path)}
+		An augmenting path with respect to a matching $M$ is an alternation path in which the 
+		first and last vertices are exposed.
+	\end{definition}
+
+	A useful property of augmenting paths is the following: let $P$ be an augmenting path with 
+	respefct to a matching $M$ (so the edges in $P$ alternate between $M$ and $G\setminus M$), 
+	and set $M^{'} = (M\setminus P)\cup (P\setminus M)$, we get a matching $M^{'}$ with 
+	$|M^{'}| = |M| + 1$. We say that we have \emph{augmented M along P}. This leads to a theorem:
+
+	\begin{theorem}{}
+		A matching $M$ is maximum if and only if there are no augmenting paths with 
+		respect to $M$.
+	\end{theorem}
+
+	\begin{proof}{}
+		Let $P$ be an augmenting path w.r.t. a matching $M$. Let $M^{'} = (M\setminus P)\cup 
+		(P\setminus M)$. Then $M^{'}$ is a matching with size greater than $M$. This 
+		contradicts the maximality of $M$.
+
+		Now suppose $M$ is not maximum. Let $M^{'}$ be a maximum matching ($|M^{'}| > |M|$). 
+		Let $Q = (M\setminus M^{'})\cup (M^{'}\setminus M)$. Then:
+		\begin{itemize}
+			\item $Q$ has more edges from $M^{'}$ than from $M$, since $|M^{'}| > |M|$ 
+				means that $|M^{'} \setminus M| > |M \setminus M^{'}|$.
+			\item Each vertex is incident to at most one edge in $M\cap Q$ and one edge 
+				in $M^{'}\cap Q$.
+			\item So $Q$ is composed of cycles and paths that alternate between edges from 
+				$M$ and $M$. This path is an augmenting path w.r.t. $M$.
+		\end{itemize}
+		Hence there must exist an augmenting path $P$ w.r.t $M$, which is a contradiction.
+	\end{proof}
+
+	This motivates the following algorithm:
+	\begin{algorithm}
+		\caption{Maximum unweighted matching}
+	\begin{algorithmic}
+		\STATE Input: $G = (V, E)$
+		\STATE $M = \emptyset$
+		\WHILE{there exists an augmenting path $P$ w.r.t. $M$}
+		    \STATE{augment $M$ along $P$ to get a matching $M^{'}$}
+		    \STATE{set $M = M^{'}$}
+		\ENDWHILE
+		\RETURN $M$
+	\end{algorithmic}
+	\end{algorithm}
+
+        \begin{subsection}{On the existence of augmenting paths}
+		We still need to address the existence, and our ability to find, augmenting paths.
+		We do this as follows: for a matching $M$ in $G$, direct an edge $A\to B$ if it 
+		does ot belong to $M$, otherwise direct it $B\to A$. Call this new directed graph 
+		$D$.
+
+		\begin{theorem}{}
+			There exists an augmenting path in $G$ w.r.t. a matching $M$ iff there 
+			exists a directed path in $D$ between an exposed vertex in $A$ and an 
+			exposed vertex in $B$.
+		\end{theorem}
+
+		\begin{proof}{}
+			Suppose there exists an augmenting path $P$ w.r.t. $M$. This means that 
+			$M^{'} = (M\setminus P)\cup (P\setminus M)$ is a new matching.
+		
+
+\end{section}
+
+
+\end{document}
