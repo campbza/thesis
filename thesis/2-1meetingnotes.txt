@@ -1,0 +1,20 @@
+Bipartite graphs & matchings
+1. defs and examples
+2. alternating paths and augmentations -- why is this valuable, figures, thm M maximum iff no 
+alternating paths
+3. template for maximum matchings (alternating forests) -- vague pseudocode for matching algorithm: 
+alternating path, augment until no more alternating paths
+
+Vertex covers (bipartite)
+1. definitions and examples
+2. Konig-Egervary theorem relating maximum matchings to vertex cover
+
+(Integer) linear programming
+1. general formulation & terminology
+2. examples: maximal matching, vertex cover: make sure to relate the linear programs to these 
+2.5: weighted matchings?
+3. primal/dual theory
+
+Hungarian algorithm 
+1. unweighted 
+2. weighted
