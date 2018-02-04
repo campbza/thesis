@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry} 
+\usepackage[margin=1in]{geometry}
+\usepackage{clrscode3e}
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage{mathtools}
 \usepackage{tikz}
@@ -44,7 +45,7 @@
 	
 	\begin{figure}[h]
 		\centering
-	\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+	\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
 		%left nodes
 		\node (n1) at (1,10) {A};
 		\node (n2) at (1,8) {B};
@@ -140,7 +141,7 @@
 
 	\begin{figure}[h]
 		\centering
-		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
 		
 		%left nodes
 		\node (n1) at (1,10) {A};
@@ -217,7 +218,7 @@
 
 	\begin{figure}[h]
 		\centering
-		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
 
 			\node (n1) at (1,10) {B};
 			\node (n2) at (3,10) {F};
@@ -237,7 +238,7 @@
 
 	\begin{figure}[h]
 		\centering
-		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,fill=blue!20}]
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
 
 			\node (n1) at (1,10) {B};
 			\node (n2) at (3,10) {F};
@@ -268,7 +269,183 @@
 		$M\oplus p$.
 	\end{definition}
 
+	This motivates a general method for finding a maximum matching on a bipartite graph: 
+	just keep looking for augmenting paths, and augment the current matching by that augmenting 
+	path. Of course, we need to prove that this in fact gives us a maximum matching. The following 
+	theorem says exactly that.
+
+	\begin{theorem}{(Berge, 1957)}
+		A matching $M$ on $G$ is a maximum matching if and only if $G$ contains no augmenting 
+		paths with respect to $M$.
+	\end{theorem}
+
+	This gives us the following framework for finding maximum matchings in bipartite graphs.
+
+	\begin{codebox}
+		\Procname{$\proc{Alg 1} (G) $}
+		\li $M \gets \emptyset $
+		\li $\While$ there exists an augmenting path $p$
+			\Do
+		\li		$M \gets M\oplus p$
+			\End
+		\li $\Return$ $M$
+	\end{codebox}
+
+	Note that we have yet to describe the details of this algorithm. Before we do so, we are going 
+	to take a step back a bit and look at the maximum matching problem from a slightly different 
+	perspective. In doing so, we will develop a language for talking about this problem that will 
+	serve us throughout the rest of this thesis. At first, the approach will appear purely 
+	pedagogic, but hopefully the reader will understand the significance of it by the end of the 
+	thesis.
+
+\end{section}
+
+\begin{section}{The vertex cover problem}
+	We begin this section by defininig a new problem. Again, this is a problem on graphs in 
+	general, but we will be restricting our attention to bipartite graphs. This is a good idea 
+	for many reasons, but the most pertinent reason is that this problem is NP-complete in the 
+	general case.
+
+	\begin{definition}{(Vertex cover)}
+		Let $G = (L,R,E)$ be a bipartite graph. A subset $C\subset L\cup R$ is said to be a 
+		\emph{vertex cover} if for each $(i,j)\in E$ is such that at least one of $i,j \in C$.
+		$C$ is a \emph{minimum} vertex cover if for any other cover $C\'$, $|C|\leq |C\'|$.
+	\end{definition}
+
+	Using what we've already learned, we can specify at least one relation between matchings and 
+	vertex covers: namely, the vertices of all edges in any maximal matching on a graph forms a 
+	vertex cover. Here are some examples of vertex covers on the graph we've been looking at.
+
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+		
+		%left nodes
+		\node[fill=blue!20] (n1) at (1,10) {A};
+		\node[fill=blue!20] (n2) at (1,8) {B};
+		\node[fill=blue!20] (n3) at (1,6) {C};
+		\node[fill=blue!20] (n4) at (1,4) {D};
+
+		%right nodes
+		\node (n5) at (4,10) {E};
+		\node (n6) at (4, 8) {F};
+		\node[fill=blue!20] (n7) at (4, 6) {G};
+		
+		%edges
+		\draw (n1) -- (n5);
+		\draw (n1) -- (n7);
+		\draw (n2) -- (n5);
+		\draw (n2) -- (n6);
+		\draw (n3) -- (n5);
+		\draw (n4) -- (n6);
+		\draw (n4) -- (n7);
+
+		%left nodes
+		\node (m1) at (7,10) {A};
+		\node (m2) at (7,8) {B};
+		\node (m3) at (7,6) {C};
+		\node (m4) at (7,4) {D};
+
+		%right nodes
+		\node[fill=blue!20] (m5) at (10,10) {E};
+		\node[fill=blue!20] (m6) at (10, 8) {F};
+		\node[fill=blue!20] (m7) at (10, 6) {G};
+		
+		%edges
+		\draw (m1) -- (m5);
+		\draw (m1) -- (m7);
+		\draw (m2) -- (m5);
+		\draw (m2) -- (m6);
+		\draw (m3) -- (m5);
+		\draw (m4) -- (m6);
+		\draw (m4) -- (m7);
+
+		\end{tikzpicture}
+		\caption{Examples of vertex covers}
+	\end{figure}
+
+	You can convince yourself that the cover on the right is a minimum cover. This brings us 
+	to an important theorem. We first prove a lemma.
+
+	\begin{lemma}{1}
+		Let $G=(L,R,E)$ be a bipartite graph. Let $M$ be a matching on $G$ and $C$ a cover on 
+		$G$ such that $|M| = |C|$. Then $M$ is a maximum matching and $C$ is a minimum 
+		covering.
+	\end{lemma}
+
+	\begin{proof}
+		Let $M\'$ be a maximum matching on $G$ and $C\'$ a minimum covering on $G$. For each 
+		$(i,j)\in M\'$, $C\'$ must include either $i$ or $j$, which tells us that 
+		$|M\'| \leq |C\'|$. Then we have 
+		\[
+			|M|\leq |M\'| \leq |C\'| \leq |C|.
+		\]
+		Thus, if $|M| = |C|$ we have equalities above, which means that the size of a maximum 
+		matching is equal to the size of a minimum covering.
+	\end{proof}
+
+	Before we prove this, we define a couple of terms. Given a matching $M$, we say a vertex is 
+	\emph{saturated} if it is incident to some edge in $M$. Also, an $M$-alternating path is 
+	an alternating path with respect to $M$.
+
+	\begin{theorem}{(K\H{o}nig-Egervary)}
+		For any bipartite graph $G$, if $M$ is a maximum matching on $G$ and $C$ is a minimum 
+		vertex cover  on $G$, then $|M| = |C|$.
+	\end{theorem}
+
+	\begin{proof}
+		Let $G=(L,R,E)$ be a bipartite graph, and let $M$ be a maximum matching on $G$. 
+		Furethermore, define
+		\[
+			A := \{s\in S\; |\; s \text{ unsaturated}\}
+		\]
+		and
+		\[
+			B := \{\text{ all vertices connected to nodes in $A$ by $M$-alternating paths}\}
+			.
+		\]
+		Let $U = B\cap L$ and $V = B\cap R$. Then we have the following:
+
+		\begin{enumerate}
+			\item Every node in $V$ is saturated.
+			\item $N(U) = V$,
+		\end{enumerate}
+
+		where $N(U)$ denotes the set of all vertices connected to elements of $U$ (the 
+		``neighbors'' of $U$). The first claim comes from the fact that, if $M$ is a 
+		maximum matching, then our alternating paths starting at nodes in $A$ must have 
+		length $\geq 2$, and must have even length (otherwise we would have an augmenting path, 
+		which contradicts our assumption that $M$ is a maximum matching).
+		The second comes from that fact that every node in $N(U)$ is connected to vertices in 
+		$A$ by an alternating path. \\
+		Now, define $K := (L\setminus U)\cup V$. Every edge 
+		in $G$ must have one of its endpoints in $K$. If not, there there would be an 
+		edge with one end in $U$ and one end in $R\setminus V$, which contradicts 
+		$N(U) = V$. So $K$ is a covering of $G$. Moreover, $|K| = |M|$, since for each 
+		edge in $M$ we've included one of its endpoints in $K$ (the vertices we've chosen are 
+		those in $N(U)$ and those in $L\setminus U$). Thus, by the previous lemma, $K$ is 
+		a minimum covering.
+	\end{proof}
+
+	All of this tells us that there is a deep relationship between maximum matchings and 
+	minimum vertex covers on bipartite graphs. Given a solution to one, we can turn it into a 
+	solution to the other. This is what we seek to accomplish next. 
+\end{section}
+
+\begin{section}{Linear programming}
+	For a more detailed treatment on linear programming, we will refer you to (CITE LP SOURCES).
+	For the purposes of this thesis, we will treat linear programming more casually, only requiring 
+	few key results. Moreover, we will not be discussing methods of actually solving linear 
+	programs. \\
+	In the general linear-programming problem, our goal is to optimize some linear function that 
+	is constrained by a set of linear inequalities. These problems are ubiquitous in applied math 
+	and computer science, as they model a system in which something needs to be optimized according 
+	to competing resources. We can express a general \emph{maximization} linear program as
+	
+		
 
 
 \end{section}
+
+
 \end{document}
