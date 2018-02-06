@@ -14,6 +14,7 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\R}{\mathbb{R}}
 \renewcommand{\'}{^{'}}
+\renewcommand{\gets}{:=}
  
 \newenvironment{theorem}[2][Theorem]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
@@ -401,7 +402,7 @@
 		\]
 		and
 		\[
-			B := \{\text{ all vertices connected to nodes in $A$ by $M$-alternating paths}\}
+			B := \{\text{all vertices connected to nodes in $A$ by $M$-alternating paths}\}
 			.
 		\]
 		Let $U = B\cap L$ and $V = B\cap R$. Then we have the following:
@@ -441,7 +442,48 @@
 	is constrained by a set of linear inequalities. These problems are ubiquitous in applied math 
 	and computer science, as they model a system in which something needs to be optimized according 
 	to competing resources. We can express a general \emph{maximization} linear program as
-	
+
+	\begin{alignat}{3}
+		& \text{maximize } & \sum_{j=1}^{n} c_{j} x_{j}& \\
+		& \text{subject to } \quad & \sum_{j=1}^{n} a_{ij} x_{j} & \leq b_{j}, & i & = 1, \dots 
+		, m \\
+				&& x_{j} & \geq 0, \quad & j & = 1, \dots, n.
+	\end{alignat}
+
+	We call the function in (1) our \emph{objective function}, and the linear inequalities (2) and 
+	(3) our constraints. Similarly, a \emph{minimization} linear program takes the form
+
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{j=1}^{n} c_{j} x_{j}& \\
+		& \text{subject to } \quad & \sum_{j=1}^{n} a_{ij} x_{j} & \geq b_{j}, & i & = 1, \dots 
+		, m \\
+				&& x_{j} & \geq 0, \quad & j & = 1, \dots, n.
+	\end{alignat}
+
+	Many problems which on the face may not appear to be optimization problems turn out to be 
+	easily transcribable into the linear programming formulation. Our goal in this section will 
+	be to describe our two problems, maximum matchings and minimum vertex covers, as linear 
+	programs.\\
+
+	Let's first turn maximum matching into a linear program. Our goal is to maximize the number 
+	of edges in our matching. Our constraint is that no edge is incident to more than one edge 
+	in the matching. So for each edge $(i,j)$, we will need a corresponding $x_{ij}$. Our objective 
+	function is then pretty simple: maximize the number of $x_{ij}$. Now we need to figure out 
+	our constraint equations. For a fixed node $i$, the number of edges in the matching incident 
+	to $i$ is given by $\sum_{j} x_{ij}$. So we want that this is $\leq 1$. Similarly, for any 
+	node $j$, we want $\sum_{i} x_{ij} \leq 1$. This gives us the following linear program.
+
+	%Maximum matching ILP%
+
+	\begin{alignat}{3}
+		& \text{maximize } & \sum_{i,j} x_{ij}& \\
+		& \text{subject to } \quad & \sum_{j} x_{ij} & \leq 1, & \quad \forall i &, \\
+				     &\quad & \sum_{i} x_{ij} & \leq 1, & \quad \forall j &, \\
+				&& x_{ij} & \in \{0,1\}.
+	\end{alignat}
+
+	%Minimum vertex cover ILP%
+
 		
 
 
