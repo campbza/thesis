@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2018.1.28)  4 FEB 2018 18:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2018.1.28)  6 FEB 2018 21:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -622,11 +622,16 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [3] [4]
-Underfull \hbox (badness 10000) in paragraph at lines 463--467
+Underfull \hbox (badness 10000) in paragraph at lines 463--468
 
  []
 
-[5] [6] (./ch1.aux) ) 
+[5]
+Underfull \hbox (badness 10000) in paragraph at lines 510--512
+
+ []
+
+[6] [7] (./ch1.aux) ) 
 Here is how much of TeX's memory you used:
  14148 strings out of 494902
  277733 string characters out of 6179891
@@ -648,10 +653,10 @@ t/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts
 ublic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
 amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
 s/cm/cmti10.pfb>
-Output written on ch1.pdf (6 pages, 165654 bytes).
+Output written on ch1.pdf (7 pages, 170931 bytes).
 PDF statistics:
- 78 PDF objects out of 1000 (max. 8388607)
- 56 compressed objects within 1 object stream
+ 83 PDF objects out of 1000 (max. 8388607)
+ 60 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 
