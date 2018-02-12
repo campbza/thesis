@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2018.1.28)  6 FEB 2018 21:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2018.1.28)  8 FEB 2018 11:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -622,38 +622,43 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [3] [4]
-Underfull \hbox (badness 10000) in paragraph at lines 463--468
+Underfull \hbox (badness 10000) in paragraph at lines 464--470
 
  []
 
 [5]
-Underfull \hbox (badness 10000) in paragraph at lines 510--512
+Underfull \hbox (badness 10000) in paragraph at lines 509--511
 
  []
 
-[6] [7] (./ch1.aux) ) 
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 540--545
+
+ []
+
+[7] (./ch1.aux) ) 
 Here is how much of TeX's memory you used:
  14148 strings out of 494902
  277733 string characters out of 6179891
- 328540 words of memory out of 5000000
+ 328508 words of memory out of 5000000
  17173 multiletter control sequences out of 15000+600000
  13560 words of font info for 51 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
  55i,10n,61p,419b,710s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-bx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></
-usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/sh
-are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dis
-t/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmti10.pfb>
-Output written on ch1.pdf (7 pages, 170931 bytes).
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12
+.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmti10.pfb>
+Output written on ch1.pdf (7 pages, 171026 bytes).
 PDF statistics:
  83 PDF objects out of 1000 (max. 8388607)
  60 compressed objects within 1 object stream

@@ -40,7 +40,7 @@
 
 	\begin{definition}{(Bipartite graph)}
 		A \emph{bipartite graph} is a graph whose vertices can be partitioned into two 
-		set $L$ and $R$ such that all edges connect a vertex $l\in L$ to a vertex $r\in R$.
+		sets $L$ and $R$ such that all edges connect a vertex $l\in L$ to a vertex $r\in R$.
 		We will denote this graph $G = (L,R,E)$, where $E$ is the edge set.
 	\end{definition}
 	
@@ -128,7 +128,7 @@
 
 	Now that we know what we are working with, let's introduce a problem that 
 	we'd like to solve on these graphs.
-	We now describe the notion of a matching on a graph. We will define it for arbitrary graphs, 
+	We now describe the notion of a matching on a graph.  
 
 
 	\begin{definition}{(Matching)}
@@ -235,7 +235,7 @@
 	Call this sequence $p$. Let's perform an 
 	operation that we will denote $M\oplus p$, which operates like XOR: add to $M$ each edge in 
 	$p$ that isn't in $M$, and remove from $M$ each edge in $p$ that is in $M$. This gives us 
-	the following segment:
+	the following segment, where $(B,F)$ and $(D,G)$ are now in $M$, but $(D,F)$ is not:
 
 	\begin{figure}[h]
 		\centering
@@ -252,8 +252,11 @@
 		\end{tikzpicture}
 	\end{figure}
 
-	Notice that the size of our matching has grown by 1! In fact, this new matching is exactly 
-	the matching given by the graph on the right in Figure 2. This is a general technique in 
+	First, we must check that the new $M$ is still a valid matching; we do this by noticing that 
+	$B$ and $G$ were originally unmatched, so it's okay for one of their incident edges to be 
+	added. Also, notice that the size of our matching has grown by 1! In fact, this new matching 
+	is exactly the matching given by the graph on the right in Figure 2. 
+	This is a general technique in 
 	finding maximum matchings. We want to look for these paths that start and end at unmatched 
 	vertices, and whose edges are alternately matched and unmatched. If we can find one of these 
 	paths, we will be able to increase the size of matching. We define this formally now.
@@ -396,7 +399,7 @@
 
 	\begin{proof}
 		Let $G=(L,R,E)$ be a bipartite graph, and let $M$ be a maximum matching on $G$. 
-		Furethermore, define
+		Furthermore, define
 		\[
 			A := \{s\in S\; |\; s \text{ unsaturated}\}
 		\]
@@ -434,6 +437,7 @@
 \end{section}
 
 \begin{section}{Linear programming}
+	Add sentence relating to last section (we are formulating this things as optimization problems).
 	For a more detailed treatment on linear programming, we will refer you to (CITE LP SOURCES).
 	For the purposes of this thesis, we will treat linear programming more casually, only requiring 
 	few key results. Moreover, we will not be discussing methods of actually solving linear 
@@ -449,7 +453,6 @@
 		, m \\
 				&& x_{j} & \geq 0, \quad & j & = 1, \dots, n.
 	\end{alignat}
-
 	We call the function in (1) our \emph{objective function}, and the linear inequalities (2) and 
 	(3) our constraints. Similarly, a \emph{minimization} linear program takes the form
 
@@ -459,7 +462,6 @@
 		, m \\
 				&& x_{j} & \geq 0, \quad & j & = 1, \dots, n.
 	\end{alignat}
-
 	Many problems which on the face may not appear to be optimization problems turn out to be 
 	easily rephrased as linear programs. Our goal in this section will 
 	be to describe our two problems, maximum matchings and minimum vertex covers, as linear 
@@ -485,17 +487,19 @@
 			&& \mathbf{y} &\geq 0
 		\end{alignat*}
 	\end{definition}
-
-	The first thing to note is that the dual of the dual is the primal.
+	The first thing to note is that the dual of the dual is the primal. Let us introduce some 
+	notation. First, let us denote the primal maximization problem by the letter $\Gamma$, and 
+	the dual minimization problem by the letter $\Omega$. For a given linear program, we denote 
+	an optimal solution by $\mathbf{OPT}$. 
+	%%add bit on notation on capital greek letters, OPT, etc so this is clear%%
 
 	\begin{theorem}{(Weak duality)}
 		If the primal linear program (in maximization form) and the dual (in minimization 
 		form) are both feasible, then 
 		\[
-			\mathbf{OPT}(\text{primal}) \leq \mathbf{OPT}(\text{dual}).
+			\mathbf{OPT}(\Gamma) \leq \mathbf{OPT}(\Omega).
 		\]
 	\end{theorem}
-
 	What's surprising is the following theorem.
 
 	\begin{theorem}{(Strong duality)}
@@ -505,8 +509,6 @@
 			\mathbf{OPT}(\Gamma) = \mathbf{OPT}(\Omega).
 		\]
 	\end{theorem}
-
-
 	Our goal now is to use this theory to relate the maximum matching problem to the minimum 
 	vertex cover problem.\\
 
@@ -526,12 +528,11 @@
 				     &\quad & \sum_{i} x_{ij} & \leq 1, & \quad \forall j\in T &, \\
 				&& x_{ij} & \in \{0,1\}.
 	\end{alignat}
-
 	Now let's try and construct the dual of this linear program. We will need a variable 
 	$u_i$ for each vertex $i$ in (8). Similarly, we need a variable $v_j$ for each vertex $j$ in 
 	(9). Our objective will be to minimize over the sum of these $u_i,v_j$. Since our constraint 
 	in the primal is the constant vector 1, our only constraint will be that $u_i + v_j \geq 1$. 
-	This gives us the duall linear program
+	This gives us the dual linear program
 
 	%Vertex cover ILP%
 
@@ -541,10 +542,14 @@
 				    && u_i,v_j & \in \{0,1\}.
 	\end{alignat}
 
+	%note that i've shown only integer linear programs, talk about non-integer LPs%%
+
 	This dual problem tells us that each edge must be ``covered'' by at least one of its incident 
 	vertices. This is exactly the vertex cover problem! So for bipartite graphs, the linear 
 	programs for maximum matchings and minimum vertex covers are duals of each other. We will 
-	use this insight to construct our algorithms for solving the maximum matching problem.
+	use this insight to construct our algorithms for solving the maximum matching problem.\\
+
+	
 
 \end{section}
 
