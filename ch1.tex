@@ -547,11 +547,91 @@
 	This dual problem tells us that each edge must be ``covered'' by at least one of its incident 
 	vertices. This is exactly the vertex cover problem! So for bipartite graphs, the linear 
 	programs for maximum matchings and minimum vertex covers are duals of each other. We will 
-	use this insight to construct our algorithms for solving the maximum matching problem.\\
+	use this insight to construct our algorithms for solving the maximum matching problem.\\	
+\end{section}
 
+\begin{section}{Primal-dual matching algorithms}
+
+	The reader may be familiar with matching algorithms via Ford-Fulkerson. They likely took a 
+	flow approach to the problem. Here, we take an approach motivated by the integer linear 
+	programs we described in the previous section. 
+
+	\begin{definition}{(Alternating tree)}
+		Let $G = (L,R,E)$ be a bipartite graph, and $M$ a matching on $G$. An 
+		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
+		conditions:
+		\begin{itemize}
+			\item the tree contains exactly one node $i\in L$. We call $i$ the 
+				\emph{root} of the tree.
+			\item all paths between the root and any other node in the tree are 
+				alternating paths.
+		\end{itemize}
+	\end{definition}
 	
+	The K\H{o}nig Egervary theorem provides much of the motivation for this algorithm. Given a 
+	maximum matching, it tells us how to construct a minimum vertex cover. As this is a primal dual 
+	algorithm, we will be simultaneously constructing a maximum matching and a minimum vertex 
+	cover. Additionally, we want to maintain primal-dual feasibility at all steps in the 
+	computation. 
+	We initialize with the feasible matching $M = \emptyset$. Let's figure out what to initialize 
+	our vertex cover as. The most straightforward thing to do would be to initialize our vertex 
+	cover as $L\cup R$. This is certainly a feasible vertex cover, and a strict upper bound on 
+	the size of all other vertex covers. However, it turns out we can do a little better than 
+	this. Using the K\H{o}nig-Egervary theorem and the weak duality theorem, let's construct 
+	an initial vertex cover based on the intial matching $M = \emptyset$. Using the notation 
+	from the K\H{o}nig-Egervary theorem, our set $A = L$, since all vertices in $L$ are 
+	unsaturated. Then our set $B = L\cup R$. Thus, our set $K$ is equal to $R$. So we can set our 
+	initial vertex cover $C = R$. Note that this is a tighter upper bound on the size of vertex 
+	covers.
+	The algorithm looks at exposed nodes in $L$, and seeks augmenting paths from that node. In this 
+	way, each exposed $i\in L$ becomes the root of an alternating tree. Additionally, each time 
+	we augment, we update the information regarding our cover. This means we update the sets 
+	$A$ and $B$, (and thus $U$, $V$, and $C$). 
+	In order to explicitly state how we augment, we will associate with each vertex $k$ a label 
+	$\pi_{k}$, which is equal to $\emptyset$ for exposed vertices in $L$; for vertices $j$ in $T$ 
+	that are exposed, their label will be equal to some vertex $i\in L$ where $(i,j)\in E$ and 
+	$(i,j)\notin M$. We use these labels to trace the alternating path all the way to the source, 
+	which will have label $\emptyset$.
+	\begin{codebox}
+		\Procname{$\proc{ALG 2}\ (G=(L,R,E))$}
+		\li $M \gets \emptyset$
+		\li $A \gets L$, $B \gets L\cup R$, $C\gets R$
+		\li \While $|M| < |C|$
+			\Do
+		\li		\For $i\in L$ with label $\emptyset$
+					\Do
+		\li				\For $(i,j)\notin M$
+							\Do
+		\li						label $\pi_{j} \gets i$ unless already 
+								labeled`
+							\End
+					\End
+		\li		\For $j\in R$
+					\Do
+		\li				\If $j$ is exposed
+							\Then
+		\li						augment
+		\li						update $A$, $B$, $C$
+		\li						remove all labels on vertices
+		\li						label each exposed $i\in L$ with 
+								$\emptyset$
+							
+		\li					\Else
+		\li						find the unique $(i,j)\in M$, label 
+								$\pi_{i} \gets j$.
+						\End
+					\End
+			\End
+		\li \Return $M$ and $C$
+	\end{codebox}
+	We know what an augmenting path means in the primal: our sum $\sum_{i,j} x_{ij}$ increases by 
+	one. But how can we interpret augmenting paths from the dual perspective? We know that it 
+	decreases the size of the set $A$ by one. 
+
+
 
 \end{section}
+
 
 
 \end{document}
