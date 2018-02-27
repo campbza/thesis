@@ -4,6 +4,7 @@
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage{mathtools}
 \usepackage{tikz}
+\usepackage{float}
 \usetikzlibrary{positioning,arrows}
 %\usepackage{tikz-berge}
 %\usepackage{algorithm}
@@ -414,7 +415,6 @@
 			\item Every node in $V$ is saturated.
 			\item $N(U) = V$,
 		\end{enumerate}
-
 		where $N(U)$ denotes the set of all vertices connected to elements of $U$ (the 
 		``neighbors'' of $U$). The first claim comes from the fact that, if $M$ is a 
 		maximum matching, then our alternating paths starting at nodes in $A$ must have 
@@ -430,7 +430,6 @@
 		those in $N(U)$ and those in $L\setminus U$). Thus, by the previous lemma, $K$ is 
 		a minimum covering.
 	\end{proof}
-
 	All of this tells us that there is a deep relationship between maximum matchings and 
 	minimum vertex covers on bipartite graphs. Given a solution to one, we can turn it into a 
 	solution to the other. This is what we seek to accomplish next. 
@@ -541,21 +540,48 @@
 		& \text{subject to } \quad & u_i + v_j & \geq 1 & \quad \forall i,j &, \\
 				    && u_i,v_j & \in \{0,1\}.
 	\end{alignat}
-
-	%note that i've shown only integer linear programs, talk about non-integer LPs%%
-
 	This dual problem tells us that each edge must be ``covered'' by at least one of its incident 
-	vertices. This is exactly the vertex cover problem! So for bipartite graphs, the linear 
-	programs for maximum matchings and minimum vertex covers are duals of each other. We will 
-	use this insight to construct our algorithms for solving the maximum matching problem.\\	
+	vertices. This is exactly the vertex cover problem! So for unweighted bipartite graphs, the 
+	linear programs for maximum matchings and minimum vertex covers are duals of each other. 
+	We will use this insight to construct our algorithms for solving the maximum matching problem. 
+	\\
+	There is another version of this problem, called the \emph{maximum weight matching}. In this 
+	version, we are given a bipartite graph with non-negative edge weights $w_{ij}$ for all 
+	edges $(i,j)$. Instead of trying to maximize the number of edges in the matching, the goal 
+	is to find a matching $M$ such that $\sum_{(i,j) \in M} w_{ij}$, or the weight of the matching, 
+	is greater than the weight of any other matching. We can easily encode this problem by making 
+	a slight modification to our linear program from before. The primal is given by
+	\begin{alignat}{3}
+		& \text{maximize } & \sum_{i,j} w_{ij}x_{ij}& \\
+		& \text{subject to } \quad & \sum_{j} x_{ij} & \leq 1, & \quad \forall i\in S&, \\
+				     &\quad & \sum_{i} x_{ij} & \leq 1, & \quad \forall j\in T &, \\
+				&& x_{ij} & \in \{0,1\}.
+	\end{alignat}
+	Then the dual is
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{i,j} (u_i + v_j)& \\
+		& \text{subject to } \quad & u_i + v_j & \geq w_{ij} & \quad \forall i,j &, \\
+				    && u_i,v_j & \in \{0,1\}.
+	\end{alignat}
+	The dual is a sort of weighted vertex cover. One way to think about it is that each edge 
+	has a ``cost'' given by $w_{ij}$, and each of its endpoints has to pool ``money'' in order 
+	to pay at least that cost. So instead of edges being covered or not covered, there's a certain 
+	``amount'' that they have to be covered.\\
+	In this section, we have only described integer linear programs. In general, solving these 
+	is NP-hard. However, we are primarily using these integer linear programs as tools to better 
+	understand the structure of the matching problem, and how it relates to the vertex cover 
+	problem. We are not developing tools to \emph{solve} these linear programs.
+	We will use these linear programs to motivate the algorithms given in the next section. 
 \end{section}
 
-\begin{section}{Primal-dual matching algorithms}
-
-	The reader may be familiar with matching algorithms via Ford-Fulkerson. They likely took a 
-	flow approach to the problem. Here, we take an approach motivated by the integer linear 
-	programs we described in the previous section. 
-
+\begin{section}{The Hungarian algorithm}
+	The reader is probably familiar with certain methods for finding a maximum cardinality matching 
+	on a bipartite graph; they've likely been introduced to the problem via flows, a la 
+	Ford-Fulkerson. 
+	Here, we offer a different perspective, which is motivated by the linear programs we derived 
+	in the previous section.
+	Our algorithm works by taking every exposed node on the left, and from that node building a 
+	collection of alternating paths. We define this collection formally.
 	\begin{definition}{(Alternating tree)}
 		Let $G = (L,R,E)$ be a bipartite graph, and $M$ a matching on $G$. An 
 		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
@@ -567,71 +593,331 @@
 				alternating paths.
 		\end{itemize}
 	\end{definition}
-	
-	The K\H{o}nig Egervary theorem provides much of the motivation for this algorithm. Given a 
-	maximum matching, it tells us how to construct a minimum vertex cover. As this is a primal dual 
-	algorithm, we will be simultaneously constructing a maximum matching and a minimum vertex 
-	cover. Additionally, we want to maintain primal-dual feasibility at all steps in the 
-	computation. 
-	We initialize with the feasible matching $M = \emptyset$. Let's figure out what to initialize 
-	our vertex cover as. The most straightforward thing to do would be to initialize our vertex 
-	cover as $L\cup R$. This is certainly a feasible vertex cover, and a strict upper bound on 
-	the size of all other vertex covers. However, it turns out we can do a little better than 
-	this. Using the K\H{o}nig-Egervary theorem and the weak duality theorem, let's construct 
-	an initial vertex cover based on the intial matching $M = \emptyset$. Using the notation 
-	from the K\H{o}nig-Egervary theorem, our set $A = L$, since all vertices in $L$ are 
-	unsaturated. Then our set $B = L\cup R$. Thus, our set $K$ is equal to $R$. So we can set our 
-	initial vertex cover $C = R$. Note that this is a tighter upper bound on the size of vertex 
-	covers.
-	The algorithm looks at exposed nodes in $L$, and seeks augmenting paths from that node. In this 
-	way, each exposed $i\in L$ becomes the root of an alternating tree. Additionally, each time 
-	we augment, we update the information regarding our cover. This means we update the sets 
-	$A$ and $B$, (and thus $U$, $V$, and $C$). 
-	In order to explicitly state how we augment, we will associate with each vertex $k$ a label 
-	$\pi_{k}$, which is equal to $\emptyset$ for exposed vertices in $L$; for vertices $j$ in $T$ 
-	that are exposed, their label will be equal to some vertex $i\in L$ where $(i,j)\in E$ and 
-	$(i,j)\notin M$. We use these labels to trace the alternating path all the way to the source, 
-	which will have label $\emptyset$.
-	\begin{codebox}
-		\Procname{$\proc{ALG 2}\ (G=(L,R,E))$}
-		\li $M \gets \emptyset$
-		\li $A \gets L$, $B \gets L\cup R$, $C\gets R$
-		\li \While $|M| < |C|$
-			\Do
-		\li		\For $i\in L$ with label $\emptyset$
-					\Do
-		\li				\For $(i,j)\notin M$
-							\Do
-		\li						label $\pi_{j} \gets i$ unless already 
-								labeled`
-							\End
-					\End
-		\li		\For $j\in R$
-					\Do
-		\li				\If $j$ is exposed
-							\Then
-		\li						augment
-		\li						update $A$, $B$, $C$
-		\li						remove all labels on vertices
-		\li						label each exposed $i\in L$ with 
-								$\emptyset$
-							
-		\li					\Else
-		\li						find the unique $(i,j)\in M$, label 
-								$\pi_{i} \gets j$.
-						\End
-					\End
-			\End
-		\li \Return $M$ and $C$
-	\end{codebox}
-	We know what an augmenting path means in the primal: our sum $\sum_{i,j} x_{ij}$ increases by 
-	one. But how can we interpret augmenting paths from the dual perspective? We know that it 
-	decreases the size of the set $A$ by one. 
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+		
+		%left nodes
+		\node (n1) at (1,10) {A};
+		\node (n2) at (1,8) {B};
+		\node (n3) at (1,6) {C};
+		\node (n4) at (1,4) {D};
+		\node (n5) at (1,2) {E};
+
+		%right nodes
+		\node (n6) at (4,10) {F};
+		\node (n7) at (4,8) {G};
+		\node (n8) at (4,6) {H};
+		\node (n9) at (4,4) {I};
+		\node (n10) at (4,2) {J};
+		
+		%edges
+		\draw[red] (n1) -- (n6);
+		\draw (n1) -- (n8);
+		\draw (n2) -- (n6);
+		\draw (n2) -- (n7);
+		\draw (n3) -- (n6);
+		\draw[red] (n4) -- (n7);
+		\draw (n4) -- (n8);
+		\draw (n2) -- (n9);
+		\draw[red] (n5) -- (n9);
+		\draw (n5) -- (n10);
+
+		%alternating tree
+		\node (n11) at (7,6) {B};
+		\node (n12) at (9,8) {F};
+		\node (n13) at (9,6) {G};
+		\node (n14) at (9,4) {I};
+		\node (n15) at (11,8) {A};
+		\node (n16) at (11,6) {D};
+		\node (n17) at (11,4) {E};
+		\node (n18) at (13,8) {H};
+		\node (n20) at (13,4) {J};
+
+		%tree edges
+		\draw (n11) -- (n12);
+		\draw (n11) -- (n13);
+		\draw (n11) -- (n14);
+		\draw[red] (n12) -- (n15);
+		\draw[red] (n13) -- (n16);
+		\draw[red] (n14) -- (n17);
+		\draw (n15) -- (n18);
+		\draw (n17) -- (n20);
+		\end{tikzpicture}
+		\caption{Bipartite graph with matching, corresponding alternating tree rooted at 
+		vertex $B$.}
+	\end{figure}
+
+	Let's remind ourselves what the primal-dual linear programs
+	motivate. We want to minimize $\sum w_{ij}$, and maximize $\sum (u_i + v_j)$. Moreover, 
+	we want optimal solutions such that $\sum w_{ij} = \sum (u_i + v_j)$. For our primal, we are 
+	keeping track of edge weights. For the dual, we will be keeping track of a ``labeling'' on 
+	vertices. We define what a labeling is now.
+
+	\begin{definition}{(Labeling)}
+		A \emph{vertex labeling} on a weighted bipartite graph $G = (L,R,E)$ is a function 
+		$l: L\cup R \to \N$. We call the labeling \emph{feasible} if for all $i\in L$ and 
+		$j\in R$, $l(i) + l(j) \geq w_{ij}$.
+	\end{definition}
+	This labeling corresponds to our dual variables; i.e. a feasible labeling is a feasible dual 
+	solution. It will be helpful us to look at a certain subset of our graph where the labeling 
+	is exact ($l(i) + l(j) - w_{ij} = 0$).
+	\begin{definition}{(Equality subgraph)}
+		The \emph{equality subgraph} of $G = (L,R,E)$ is the graph $G_l = (L,R,E_l)$, 
+		where 
+		\[
+			E_l = \{(i,j)\ :\ l(i) + l(j) = w_{ij}\}.
+		\]
+	\end{definition}
+	In Figure 5 we show a bipartite graph along with its corresponding equality graph.
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+			%left nodes
+			\node [label=left:{1}] (n1) at (1,10) {A};
+			\node [label=left:{1}] (n2) at (1,6) {B};
+			\node [label=left:{1}] (n3) at (1,2) {C};
+
+			%right nodes
+			\node [label=right:{2}] (n4) at (5,10) {D};
+			\node [label=right:{1}] (n5) at (5,6) {E};
+			\node [label=right:{2}] (n6) at (5,2) {F};
+
+			%edges
+			\draw (n1) -- node[near start,draw=none,above] {3} ++(n4);
+			\draw (n1) -- node[near start,draw=none,above] {2} ++(n5);
+			\draw (n1) -- node[near end,draw=none,below] {3} ++(n6);
+
+			\draw (n2) -- node[near end,draw=none,above] {1} ++(n4);
+			\draw (n2) -- node[near start,draw=none,above] {2} ++(n5);
+			\draw (n2) -- node[near end,draw=none,below] {0} ++(n6);
+
+			\draw (n3) -- node[near start,draw=none,below] {3} ++(n4);
+			\draw (n3) -- node[near start,draw=none,below] {2} ++(n5);
+			\draw (n3) -- node[near end,draw=none,below] {1} ++(n6);
 
 
+			%left nodes
+			\node [label=left:{1}] (n7) at (10,10) {A};
+			\node [label=left:{1}] (n8) at (10,6) {B};
+			\node [label=left:{1}] (n9) at (10,2) {C};
 
+			%right nodes
+			\node [label=right:{2}] (n10) at (14,10) {D};
+			\node [label=right:{1}] (n11) at (14,6) {E};
+			\node [label=right:{2}] (n12) at (14,2) {2};
+
+			%edges
+			\draw (n7) -- node[near start,draw=none,above] {3} ++(n10);
+			\draw (n7) -- node[near start,draw=none,above] {2} ++(n11);
+			\draw (n7) -- node[near end,draw=none,below] {3} ++(n12);
+
+			\draw (n8) -- node[near start,draw=none,above] {2} ++(n11);
+
+			\draw (n9) -- node[near start,draw=none,below] {3} ++(n10);
+			\draw (n9) -- node[near start,draw=none,below] {2} ++(n11);
+		\end{tikzpicture}
+		\caption{A weighted bipartite graph and its corresponding equality subgraph.}
+	\end{figure}
+	\begin{theorem}{(Kuhn-Munkres)}
+		If $l$ is a feasible labeling and $M$ is a perfect matching in $G_l$ then $M$ is a 
+		max-weight matching.
+	\end{theorem}
+
+	\begin{proof}
+		Let $M\'$ be a perfect matching in $G$. Since every $u\in L\cup R$ is matched 
+		by exactly one edge in $M\'$. Then 
+		\[
+			\sum_{(i,j)\in M\'} w_{ij} \leq \sum_{(i,j)\in M\'} (l(i)+l(j)) = 
+			\sum_{u\in L\cup R} l(u).
+		\]
+		This says that the sum of our label values is an upper bound on the weight of any 
+		perfect matching.
+		Now suppose that $M$ is a perfect matching in $E_l$. Then 
+		\[
+			\sum_{(i,j)\in M} w_{ij} = \sum_{u\in L\cup R} l(u).
+		\]
+		So $\sum_{(i,j)\in M\'} w_{ij} \leq \sum_{(i,j)\in M}$, meaning $M$ must be maximum 
+		weight.
+	\end{proof}
+
+	\begin{lemma}{2}
+		Let $S\subseteq L$ and $T = N_l(S) \neq R$. Set 
+		\[
+			\alpha_l = \min _{i\in S,\ j\notin T} \{l(i) + l(j) - w_{ij}\}
+		\]
+		and 
+		\[
+			l\' (v) = 
+			\begin{cases}
+				l(v) - \alpha_l &\text{ if } v\in S \\
+				l(v) + \alpha_l &\text{ if } v\in T \\
+				l(v) &\text{ otherwise.}
+			\end{cases}
+		\]
+		Then $l\'$ is a feasible labeling, and 
+		\begin{enumerate}
+			\item If $(i,j)\in E_l$ for $i\in S$ and $j\in T$ then $(i,j)\in E_{l\'}$.
+			\item If $(i,j)\in E_l$ for $i\notin S$, and $j\notin T$, then $(i,j)\in 
+				E_{l\'}$.
+			\item There is some edge $(i,j)\in E_{l\'}$ for $i\in S$, $j\notin T$.
+		\end{enumerate}
+	\end{lemma}
+
+	\begin{proof}
+		First, we show that $l\'$ is feasible. For $i\in L$, $j\in R$, there are four 
+		possibilities:
+		\begin{itemize}
+			\item if $i\in S$ and $j\in T$ then $l\' (i) + l\' (j) = l(i) + l(j)$.
+			\item if $i\notin S$ and $j\notin T$, $l\' (i) = l(i)$ and $l\' (j) = l(j)$, 
+				so $l\' (i) + l\' (j) = l(i) + l(j)$.
+			\item if $i\in S$ and $j\notin T$, $l\' (i) - \alpha$ and $l\' (j) = l(j)$. 
+				We know $\alpha = \min_{x\in S,y\notin t} \{l(x) + l(y) - w_{xy}\}$, 
+				which means $\alpha \leq l(i) + l(j) - w_{ij}$, and thus 
+				$l\' (i) + l\' (j) \geq w_{ij}$.
+			\item if $i\notin S$ and $j\in T$, $l\' (i) = l(i)$ and $l\' (j) = l(j) + 
+				\alpha$, which is clearly feasible.
+		\end{itemize}
+		(1) and (2) follow from above. To see (3), note that there is some $(i,j)$ with 
+		$i\in S$, $j\in T$ such that $\alpha = l(i) + l(j) - w_{ij}$, so when we take 
+		$l\' (i) = l(i) - \alpha$ and $l\' (j) = l(j)$, we get 
+		\begin{align*}
+			l\' (i) + l\' (j) - w_{ij} &= l(i) - \alpha + l(j) - w_{ij} \\
+						   &= l(i) + l(j) - w_{ij} - \alpha \\
+						   &= \alpha - \alpha \\
+						   &= 0.
+		\end{align*}
+		This is exactly what it means for an $(x,y)$ to be in $E_l$.
+	\end{proof}
+	We now look at the Hungarian method for finding maximum-weight matchings on bipartite graphs. 
+	This method was originally developed by Harold Kuhn, who named it in honor of the Hungarian 
+	mathematicians K\H{o}nig and Egervary.\\
+	\\
+	\textbf{The Hungarian Method}
+	\begin{enumerate}
+		\item Choose initial feasible labeling $l$ and matching $M$ in $G_l$.
+		\item If $M$ is perfect in $G_l$, we are done. Otherwise, pick exposed 
+			vertex $i\in L$. Set $S = \{i\}$, $T=\emptyset$.
+		\item If $N_l (S) = T$, update labels as in lemma (this forces $N_l (S)\neq T$).
+		\item If $N_l (S) \neq T$, pick $j\in N_l (S)\setminus T$
+			\begin{itemize}
+				\item If $j$ is exposed, $p = i\to j$ is an augmenting path. Set 
+					$M:=M\oplus p$. Go to 2.
+				\item If $j$ is matched to some $k$, expand our alternating tree. 
+					$S := S\cup \{k\}$, $T := T\cup \{j\}$. Go to 3.
+			\end{itemize}
+	\end{enumerate}
+	We now provide an example of this algorithm.
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+
+			%left nodes
+			\node [label=left:{6}] (n1) at (1,10) {A};
+			\node [label=left:{8}] (n2) at (1,7) {B};
+			\node [label=left:{4}] (n3) at (1,4) {C};
+
+			%right nodes
+			\node [label=right:{0}] (n4) at (4,10) {D};
+			\node [label=right:{0}] (n5) at (4,7) {E};
+			\node [label=right:{0}] (n6) at (4,4) {F};
+
+			%edges
+			\draw (n1) -- node[near start, draw=none, above] {1} ++ (n4);
+			\draw (n1) -- node[near start, draw=none, below] {6} ++ (n5);
+			\draw (n2) -- node[near start, draw=none, above] {8} ++ (n5);
+			\draw (n2) -- node[near end, draw=none, above] {6} ++ (n6);
+			\draw (n3) -- node[near end, draw=none, above] {4} ++ (n4);
+			\draw (n3) -- node[near end, draw=none, below] {1} ++ (n6);
+
+			
+			
+			%left nodes
+			\node [label=left:{6}] (m1) at (7,10) {A};
+			\node [label=left:{8}] (m2) at (7,7) {B};
+			\node [label=left:{4}] (m3) at (7,4) {C};
+
+			%right nodes
+			\node [label=right:{0}] (m4) at (10,10) {D};
+			\node [label=right:{0}] (m5) at (10,7) {E};
+			\node [label=right:{0}] (m6) at (10,4) {F};
+			
+			%edges
+			\draw (m1) -- node[near start, draw=none, below] {6} ++ (m5);
+			\draw[red] (m2) -- node[near start, draw=none, above] {8} ++ (m5);
+			\draw[red] (m3) -- node[near end, draw=none, above] {4} ++ (m4);
+		\end{tikzpicture}
+		\caption{Bipartite graph (left) and corresponding equality graph (right) with initial 
+		matching}
+	\end{figure}
+	Our initial matching is $M = \{(B,E), (C,D)\}$ (see Figure 6). Note that the current state of 
+	the graph is 
+	primal-dual feasible. Our algorithm chooses an exposed vertex in $L$, say $A$. So we have 
+	$S=\{A\}$ and $T=\emptyset$. We have that $N_l (S) \neq T$, so we find $E\in N_l (S)\setminus T
+	$. $E$ is matched, so we grow our alternating tree as follows: $S := S\cup \{B\} = \{A,B\}$, 
+	$T := T\cup \{E\} = \{E\}$. At this point $N_l (S) = T$, so we adjust our dual variables. 
+	Calculate $\alpha = \min _{i\in S,j\notin T} \{l(i) + l(j) - w_{ij}\} = 2$ from edge $(B,F)$. 
+	Our new equality graph is shown in Figure 7.
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+			%left nodes
+			\node [label=left:{4}] (m1) at (7,10) {A};
+			\node [label=left:{6}] (m2) at (7,7) {B};
+			\node [label=left:{4}] (m3) at (7,4) {C};
+
+			%right nodes
+			\node [label=right:{0}] (m4) at (10,10) {D};
+			\node [label=right:{2}] (m5) at (10,7) {E};
+			\node [label=right:{0}] (m6) at (10,4) {F};
+			
+			%edges
+			\draw (m1) -- node[near start, draw=none, below] {6} ++ (m5);
+			\draw[red] (m2) -- node[near start, draw=none, above] {8} ++ (m5);
+			\draw (m2) -- node[near end, draw=none, below] {6} ++ (m6);
+			\draw[red] (m3) -- node[near end, draw=none, above] {4} ++ (m4);
+		\end{tikzpicture}
+		\caption{Second equality graph.}
+	\end{figure}
+	Now, $S = \{A,B\}$ is the same, but $N_l (S) = \{E,F\}$ has changed. $T = \{E\}$, so 
+	$N_l (S) \neq T$. So we choose $F\in N_l (S)\setminus T$. $F$ is unmatched, meaning it is 
+	an endpoint of an augmenting path. In particular, $p = A,E,B,F$ is an augmenting path. Thus we 
+	improve our matching with $M := M\oplus p = \{(A,E), (B,F), (C,D)\}$. Our equality graph with 
+	the new matching is given in Figure 8.
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+			%left nodes
+			\node [label=left:{4}] (m1) at (7,10) {A};
+			\node [label=left:{6}] (m2) at (7,7) {B};
+			\node [label=left:{4}] (m3) at (7,4) {C};
+
+			%right nodes
+			\node [label=right:{0}] (m4) at (10,10) {D};
+			\node [label=right:{2}] (m5) at (10,7) {E};
+			\node [label=right:{0}] (m6) at (10,4) {F};
+			
+			%edges
+			\draw[red] (m1) -- node[near start, draw=none, below] {6} ++ (m5);
+			\draw (m2) -- node[near start, draw=none, above] {8} ++ (m5);
+			\draw[red] (m2) -- node[near end, draw=none, below] {6} ++ (m6);
+			\draw[red] (m3) -- node[near end, draw=none, above] {4} ++ (m4);
+		\end{tikzpicture}
+		\caption{Equality graph after augmenting.}
+	\end{figure}
+	This is a perfect matching on the equality graph, so this matching must be a maximum weight 
+	matching on the graph. We can check that the values of the primal and dual solutions agree. 
+	The sum of weights in the matching is $6+6+4 = 16$, and the sum of the values of our 
+	dual variables is $4+6+4+2 = 16$.
+
+	Note that if we want to just find a maximum cardinality matching, we can just give all edges 
+	weight 1 and run this algorithm.
 \end{section}
 
-
+\begin{section}{Auction Algorithms}
+	We now look at an example of using this general method for a specific problem: that of an 
+	auction. This scenario can be easily modeled with a weighted bipartite graph. Our graph 
+	will have non-negative integer weights, and the set of vertices is partitioned into 
+	$B$ (buyers) and $G$ (goods).
 
 \end{document}
