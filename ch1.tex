@@ -580,8 +580,8 @@
 	Ford-Fulkerson. 
 	Here, we offer a different perspective, which is motivated by the linear programs we derived 
 	in the previous section.
-	Our algorithm works by taking every exposed node on the left, and from that node building a 
-	collection of alternating paths. We define this collection formally.
+	Our algorithm works by taking every exposed node on the left, and from each such  node building 
+	a collection of alternating paths. We define this collection formally.
 	\begin{definition}{(Alternating tree)}
 		Let $G = (L,R,E)$ be a bipartite graph, and $M$ a matching on $G$. An 
 		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
@@ -726,14 +726,14 @@
 
 	\begin{proof}
 		Let $M\'$ be a perfect matching in $G$. Since every $u\in L\cup R$ is matched 
-		by exactly one edge in $M\'$. Then 
+		by exactly one edge in $M\'$, then 
 		\[
 			\sum_{(i,j)\in M\'} w_{ij} \leq \sum_{(i,j)\in M\'} (l(i)+l(j)) = 
 			\sum_{u\in L\cup R} l(u).
 		\]
 		This says that the sum of our label values is an upper bound on the weight of any 
 		perfect matching.
-		Now suppose that $M$ is a perfect matching in $E_l$. Then 
+		Now suppose that $M$ is a perfect matching in $G_l$. Then 
 		\[
 			\sum_{(i,j)\in M} w_{ij} = \sum_{u\in L\cup R} l(u).
 		\]

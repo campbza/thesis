@@ -1,0 +1,177 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{clrscode3e}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{float}
+\usetikzlibrary{positioning,arrows}
+%\usepackage{tikz-berge}
+%\usepackage{algorithm}
+%\usepackage[noend]{algpseudocode}
+
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\renewcommand{\'}{^{'}}
+\renewcommand{\gets}{:=}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{definition}[2][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\begin{document}
+\title{Chapter 2}
+\author{Zachary Campbell}
+
+\maketitle
+	In this chapter we will take a step back and look at primal-dual algorithms in more generality. 
+	The goal will be to describe a method of solving a set of primal-dual algorithms for 
+	\emph{network design problems}. In network design problems we are given a graph $G = (V, E)$ 
+	and a cost $c_{ij}$ for each edge $(i,j)\in E$, and the goal is to find a minimum/maximum-cost 
+	subset 
+	$E\' \subset E$ that satisfies some criteria. Our maximum-cost matching is an example. There 
+	are other common examples that we will explore later on, but for now it suffices to just think 
+	of these problems as choosing subsets of our graph according to some stipulations. Throughout, 
+	we will be looking at undirected graphs.
+
+\begin{section}{The Classical Primal-Dual Method}
+	We begin by looking at what's known as the ``classical'' primal-dual method, which is concerned 
+	with linear programs for polynomial-time solvable optimization problems. This will allow us 
+	to build up a framework for a more general primal-dual method that we can use for approximation 
+	algorithms - i.e. for problems that are known to be $NP$-hard. **(Not sure if this is within the 
+	scope of the thesis -- discuss with Jim)\\
+	Let's consider the linear program
+	\begin{alignat}{2}
+		& \text{minimize} & \mathbf{c}^{T}\mathbf{x} \\
+		& \text{subject to } & A\mathbf{x} & \geq \mathbf{b} \\
+		&& \mathbf{x} & \geq 0
+	\end{alignat}
+	and its dual
+	\begin{alignat}{2}
+		& \text{maximize} & \mathbf{b}^{T}\mathbf{y} \\
+		& \text{subject to } & A^{T}\mathbf{y} & \leq \mathbf{c} \\
+		&& \mathbf{y} & \geq 0.
+	\end{alignat}
+	We first define a concept that we will use throughout the rest of this thesis. 
+	\begin{definition}{(Complementary slackness)}
+		Given two linear programs in the form above, the \emph{primal complementary slackness 
+		conditions} are the conditions which, given primal solution $x$, are necessary for 
+		a dual solution $y$:
+		\[
+			x_j > 0 \implies A^{j}\mathbf{y} = c_j,
+		\]
+		where $A^{j}$ is the $j$th column of $A$. Similarly, the \emph{dual complementary 
+		slackness conditions} are the conditions which, given dual solution $y$, are 
+		necessary for a primal solution $x$:
+		\[
+			y_i > 0 \implies A_i\mathbf{x} = b_i,
+		\]
+		where $A_i$ is the $i$th row of $A$. Together, these conditions give us necessary and 
+		sufficient conditions for solving the primal-dual system.
+	\end{definition}
+	Recall our primal linear program for maximum-weight matching:
+	%Maximum matching ILP%
+	\begin{alignat}{3}
+		& \text{maximize } & \sum_{i,j} c_{ij} x_{ij}& \\
+		& \text{subject to } \quad & \sum_{j} x_{ij} & \leq 1, & \quad \forall i\in L&, \\
+				     &\quad & \sum_{i} x_{ij} & \leq 1, & \quad \forall j\in R &, \\
+				&& x_{ij} & \in \{0,1\}.
+	\end{alignat}
+	and its dual
+	%Vertex cover ILP%
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{i,j} (u_i + v_j)& \\
+		& \text{subject to } \quad & u_i + v_j & \geq c_{ij} & \quad \forall 
+					i\in L,\ j\in R &, \\
+				    && u_i,v_j & \in \{0,1\}.
+	\end{alignat}
+	The format here is a little different, since our primal is a maximization problem and the dual 
+	is a minimization, but it's easy enough to reverse the roles. It's easy to see our 
+	corresponding primal complementary slackness conditions
+	\begin{equation}
+		x_{ij} > 0 \implies u_i + v_j = c_{ij}.
+	\end{equation}
+	The dual complementary slackness conditions are
+	\begin{align}
+		u_i > 0 &\implies \sum_j x_{ij} = 1,\\
+		v_j > 0 &\implies \sum_i x_{ij} = 1.
+	\end{align}
+	In general, the slackness conditions guide us in our algorithm -- they tells us how, given a 
+	solution to one of the problems, we should augment the solution to the other. For example, the 
+	algorithm we presented for maximum-weight matching/minimum vertex cover intializes with 
+	a solution to both the primal and dual that satisfies conditions (8) and (10); the algorithm 
+	then at each step works to decrease the number of conditions in (9) that are unsatisfied, while 
+	maintaining satisfiability of (8) and (10). This method is not unique to the Hungarian 
+	algorithm. In fact, the Hungarian algorithm paved the way for this general method, which we 
+	describe presently.\\
+	Looking back at the original linear programs at the beginning of this chapter, suppose we have 
+	a dual feasible solution $\mathbf{y}$. We can then state the problem of finding a feasible 
+	primal 
+	solution $\mathbf{x}$ that obeys our complementary slackness conditions as another 
+	\emph{restricted} 
+	linear program. Define the sets $J = \{j\ |\ A^{j}\mathbf{y} = c_j\}$ and 
+	$I = \{i\ |\ y_i = 0\}$. So $J$ tells us which dual constraints (5) are tight, 
+	given the solution $\mathbf{y}$, and $I$ tells us which $y_i$ are 0. What we want to do is 
+	give a linear program to find a solution $\mathbf{x}$ that minimizes the 
+	``violation'' of the complementary slackness conditions and the primal constraints. We will 
+	have slack variables $s_i$ which will describe the difference between $A_i\mathbf{x}$ and $b_i$ 
+	for $i\notin I$. We do this because we want to look at all $y_i > 0$ where the we do not 
+	have that $A_i\mathbf{x} = b_i$. So part of our objective function will be to minimize the 
+	sum of these $s_i$. We also want to minimize the sum over variables $x_j$ where $j\notin J$. 
+	This is because we want to see if there are any $x_j$ such that $A^{j}\mathbf{y} \neq c_j$. 
+	So we give the following restricted primal linear program:
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{i\notin I} s_i + \sum_{j\notin J} x_j & \\
+		& \text{subject to } & A_i\mathbf{x} & \geq b_i & \quad i\in I &, \\
+				     && A_i\mathbf{x} - b_i & = s_i & \quad i\notin I &, \\
+				     && \mathbf{x} & \geq 0, \\
+				     && \mathbf{s} & \geq 0.
+	\end{alignat}
+	Observe that if this restricted primal has a feasible solution $(\mathbf{x},\mathbf{s})$ such 
+	that the objective function is 0, then $\mathbf{x}$ is a feasible primal solution that 
+	satisfies the complementary slackness conditions for the dual solution $\mathbf{y}$. This 
+	means that $\mathbf{x}$ and $\mathbf{y}$ are optimal primal and dual solutions. If, however, 
+	the optimal solution to this restricted primal has value greater than 0, more work is required. 
+	We can consider the dual of the restricted primal:
+	\begin{alignat}{3}
+		& \text{maximize } & \mathbf{b}^{T}\mathbf{y}\' & \\
+		& \text{subject to } & A^{j}\mathbf{y}\' & \leq 0 & \quad j\in J &, \\
+				     && A^{j}\mathbf{y}\' & \leq 1 & \quad j\notin J &, \\
+				     && y_i\' & \geq -1 & \quad i\notin I &, \\
+				     && y_i\' & \geq 0 & \quad i\in I &.
+	\end{alignat}
+	What we want here is to improve our dual solution. By assumption, the optimal solution to this 
+	linear program's primal is greater than 0, so we know that this dual has a solution 
+	$\mathbf{y}\'$ such that $\mathbf{b}^{T}\mathbf{y}\' > 0$. What we want is the existence of 
+	some $\epsilon > 0$ such that $\mathbf{y}^{''} = \mathbf{y} + \epsilon \mathbf{y}\'$ is a 
+	feasible dual solution. In particular, a solution of this form will be an improvement on our 
+	original soluation $\mathbf{y}$. [SEE P.148 Goemans, Williamson for $\epsilon$ calculation].\\
+	It's not immediately clear why reducing our original linear programs to a series of linear 
+	programs is heplful. However,  note that the vector $\mathbf{c}$ has totally disappeared in 
+	the restricted primal and its dual. Recall that in the original linear program, $\mathbf{c}$ 
+	gave us the edge-costs on our graph. So this method reworks our original weighted problem 
+	into unweighted parts, which are often easier to solve. Oftentimes, it is the case that 
+	we can interpret these unweighted problems as purely combinatorial, which means that instead 
+	of actually solving the problem with linear programming, we can solve it by combinatorial 
+	methods. Using a combinatorial algorithm to find a solution $\mathbf{x}$ that obeys the 
+	complementary slackness conditions, or to find an improved dual solution $\mathbf{y}$, is 
+	oftentimes more efficient.\\
+	Let's revisit our maximum matching linear program, and its dual. The sets $J$ and $I$ 
+	corresponding to the slackness conditions are given as follows:
+	\begin{align}
+		J &= \{(i,j)\in E\ |\ u_i + v_j = w_{ij}\}, \\
+		I &= \{u_i \in L\cup R\ |\ u_i = 0\}. \\
+	\end{align}
+	The classical primal dual method that we've discussed tells us to start with a feasible 
+	dual solution $\mathbf{y}$, and then to look at the restricted primal.
+\end{section}
+\end{document}
