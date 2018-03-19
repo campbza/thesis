@@ -76,9 +76,44 @@
 			y_i > 0 \implies A_i\mathbf{x} = b_i,
 		\]
 		where $A_i$ is the $i$th row of $A$. Together, these conditions give us necessary and 
-		sufficient conditions for solving the primal-dual system.
+		sufficient conditions for solving the primal-dual system, which we prove. The 
+		(maximization) primal slackness variables are given by 
+		$\mathbf{s} = \mathbf{b} - A\mathbf{x}$. The dual slackness variables are given by 
+		$\mathbf{t} = A^{T}\mathbf{y} - \mathbf{c}$.
 	\end{definition}
-	Recall our primal linear program for maximum-weight matching:
+	\begin{theorem}{}
+		Let $\mathbf{x}$ be a primal feasible solution, and $\mathbf{y}$ a dual feasible 
+		solution. Let $\mathbf{s}$ and $\mathbf{t}$ be the corresponding slackness variables. 
+		Then $\mathbf{x}$ and $\mathbf{y}$ are optimal solutions if and only if the following 
+		two conditions hold:
+		\begin{align}
+			x_jt_j &= 0 \quad \forall j \\
+			y_is_i &= 0 \quad \forall i.
+		\end{align}
+	\end{theorem}
+	\begin{proof}
+		Let $u_i = y_is_i$ and $v_j = x_jt_j$, and $\mathbf{u} = \sum_i u_i$, 
+		$\mathbf{v} = \sum_j v_j$. Then $\mathbf{u} = 0$ and $\mathbf{v} = 0$ if and only if 
+		(7) and (8) hold. Also, 
+		\begin{align*}
+			\mathbf{u} + \mathbf{v} &= \sum y_is_i + \sum x_jt_j \\
+						&= \sum y_i(b_i - A_ix_i) + \sum x_j (A^{T}_jy_j-c_j)\\
+						&= \sum b_iy_i - \sum c_jx_j,
+		\end{align*}
+		so we get that $c^{T}\mathbf{x} = b^{T}\mathbf{y}$ if and only if $u + v = 0$, which 
+		proves the statement.
+	\end{proof}
+	The general ``tug-of-war'' between the primal and dual suggests an economic interpretation 
+	of slackness conditions. We can think of our primal (maximization) problem as concerned with 
+	profit given some constraints on resources, i.e. a resource allocation problem. The dual can 
+	be interpreted as a valuation of the resources -- it tells us the availability of a resource, 
+	and its price. So if we have optimal $\mathbf{x}$ and $\mathbf{y}$, we can interpret 
+	slackness as follows: if there is slack in a constrained primal resource $i$ ($s_i > 0$), 
+	then additional units of that resource must have no value ($y_i = 0$); if there is slack 
+	in the dual price constraint ($t_j > 0$) there must be a shortage of that resource ($x_j = 0$).\\
+	We now give an example of complementary slackness in action. Let's look back to our maximum 
+	weight matching problem.
+	Recall the primal linear program for maximum-weight matching:
 	%Maximum matching ILP%
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{i,j} c_{ij} x_{ij}& \\
@@ -89,14 +124,14 @@
 	and its dual
 	%Vertex cover ILP%
 	\begin{alignat}{3}
-		& \text{minimize } & \sum_{i,j} (u_i + v_j)& \\
+		& \text{minimize } & \sum_{i}u_i + \sum_jv_j& \\
 		& \text{subject to } \quad & u_i + v_j & \geq c_{ij} & \quad \forall 
 					i\in L,\ j\in R &, \\
 				    && u_i,v_j & \in \{0,1\}.
 	\end{alignat}
 	The format here is a little different, since our primal is a maximization problem and the dual 
 	is a minimization, but it's easy enough to reverse the roles. It's easy to see our 
-	corresponding primal complementary slackness conditions
+	corresponding primal complementary slackness conditions are
 	\begin{equation}
 		x_{ij} > 0 \implies u_i + v_j = c_{ij}.
 	\end{equation}
@@ -165,13 +200,29 @@
 	methods. Using a combinatorial algorithm to find a solution $\mathbf{x}$ that obeys the 
 	complementary slackness conditions, or to find an improved dual solution $\mathbf{y}$, is 
 	oftentimes more efficient.\\
-	Let's revisit our maximum matching linear program, and its dual. The sets $J$ and $I$ 
-	corresponding to the slackness conditions are given as follows:
-	\begin{align}
-		J &= \{(i,j)\in E\ |\ u_i + v_j = w_{ij}\}, \\
-		I &= \{u_i \in L\cup R\ |\ u_i = 0\}. \\
-	\end{align}
-	The classical primal dual method that we've discussed tells us to start with a feasible 
-	dual solution $\mathbf{y}$, and then to look at the restricted primal.
+	Let's revisit our maximum matching linear program, and its dual. We will begin with the dual 
+	feasible solution $u_i = \max_{j} c_{ij}$ for all $i$, and $v_j = 0$ for all $j$. We will 
+	then try to find a corresponding primal solution that minimizes the violation of the 
+	primal constraints, and complementary slackness conditions. We will have slack variables 
+	$s_i,s_j$ corresponding to dual slackness; for $u_i,v_j$ that are not equal to zero, we want 
+	to minimize the distance, or \emph{slackness} between $\sum x_{ij}$ and 1. Additionally, 
+	we want to minimize the values on $x_{ij}$ where $u_i + v_i \neq c_{ij}$. In fact, for any 
+	edge $(i,j)\notin J$, we want the corresponding $x_{ij}$ to be zero, since if this weren't the 
+	case we would be certainly violating our complementary slackness conditions. This corresponds 
+	to the following restricted primal
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{i\in L} s_i + \sum_{j\in R} s_j & \\
+		& \text{subject to } & \sum_j x_{ij} - s_i & = 1 & \quad \forall i &, \\
+				     && \sum_i x_{ij} - s_j & = 1 & \quad \forall j &, \\
+				     && x_{ij} & = 0 & \quad (i,j)\notin J, \\
+				     && x_{ij} & \geq 0 & \quad (i,j)\in J, \\
+				     && \mathbf{s} & \geq 0.
+	\end{alignat}
+	The dual of this is given by the following linear program:
+	\begin{alignat}{3}
+		& \text{maximize } & \sum_{i\in L} u_{i}\prime + \sum_{j\in R} v_{j}\prime & \\
+		& \text{subject to } & u_i\prime + v_j\prime & \leq 0 & \quad (i,j)\in J &, \\
+				     && u_{i}\prime &\leq 1, \\
+				     && v_{j}\prime &\leq
 \end{section}
 \end{document}
