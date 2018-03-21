@@ -46,23 +46,24 @@
 	\begin{alignat}{2}
 		& \text{maximize} & \mathbf{b}^{T}\mathbf{y} \\
 		& \text{subject to } & A^{T}\mathbf{y} & \leq \mathbf{c} \\
-		&& \mathbf{y} & \geq 0.
+		&& \mathbf{y} & \geq 0
 	\end{alignat}
 	and the corresponding restricted primal and dual
 	\begin{alignat}{3}
-		& \text{minimize } & \sum_{i\notin I} s_i + \sum_{j\notin J} x_j & \\
-		& \text{subject to } & A_i\mathbf{x} & \geq b_i & \quad i\in I &, \\
-				     && A_i\mathbf{x} - b_i & = s_i & \quad i\notin I &, \\
-				     && \mathbf{x} & \geq 0, \\
-				     && \mathbf{s} & \geq 0.
+		& \text{minimize } & \sum_{i\notin I} s_i + \sum_{j\notin J} x_j \\
+		& \text{subject to } & A_i\mathbf{x} & \geq b_i & \quad i\in I \\
+				     && A_i\mathbf{x} - b_i & = s_i & \quad i\notin I\\
+				     && \mathbf{x} & \geq 0\\
+				     && \mathbf{s} & \geq 0
 	\end{alignat}
 	\begin{alignat}{3}
-		& \text{maximize } & \mathbf{b}^{T}\mathbf{y}\' & \\
-		& \text{subject to } & A^{j}\mathbf{y}\' & \leq 0 & \quad j\in J &, \\
-				     && A^{j}\mathbf{y}\' & \leq 1 & \quad j\notin J &, \\
-				     && y_i\' & \geq -1 & \quad i\notin I &, \\
-				     && y_i\' & \geq 0 & \quad i\in I &.
+		& \text{maximize } & \mathbf{b}^{T}\mathbf{y}\'  \\
+		& \text{subject to } & A^{j}\mathbf{y}\' & \leq 0 & \quad j\in J \\
+				     && A^{j}\mathbf{y}\' & \leq 1 & \quad j\notin J \\
+				     && y_i\' & \geq -1 & \quad i\notin I \\
+				     && y_i\' & \geq 0 & \quad i\in I,
 	\end{alignat}
+	we want to use the restricted dual solution to improve our actual dual solution.
 	Recall that we define the sets $I = \{i | y_i = 0\}$ and $J = \{j | A^{T}_j y = c_j\}$.
 	Goemans and Williamson claim that the dual solution $\mathbf{y}^{''} = \mathbf{y} + \epsilon 
 	\mathbf{y}^{'}$ is an improved, dual feasible solution when $\epsilon$ is given as follows. 
@@ -100,9 +101,9 @@
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{i\in L} u_{i}^{'} + \sum_{j\in R} v_{j}^{'} & \\
 		& \text{subject to } & u_i^{'} + v_j^{'} & \leq 0 & \quad (i,j)\in J &, \\
-				     & u_i^{'} + v_j^{'} & \leq 1 & \quad (i,j)\notin J &, \\
-				     && u_i^{'},v_j^{'} &\geq -1 & \quad i,j\notin I &, \\ 
-				     && u_{i}^{'},v_j^{'} &\geq 0 & \quad i,j\in I &.
+				     && u_i^{'} + v_j^{'} & \leq 1 & \quad (i,j)\notin J &, \\
+				     && u_i^{'},v_j^{'} &\geq -1 & \quad i,j\notin I, \\ 
+				     && u_{i}^{'},v_j^{'} &\geq 0 & \quad i,j\in I.
 	\end{alignat}
 	These are not a mirror of what Goemans and Williamson give, but I think they reduce to the 
 	same combinatorial problem: find a maximum cardinality matching in the subgraph $G = (L,R,J)$ 
