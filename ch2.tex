@@ -155,21 +155,22 @@
 	Looking back at the original linear programs at the beginning of this chapter, suppose we have 
 	a dual feasible solution $\mathbf{y}$. We can then state the problem of finding a feasible 
 	primal solution $\mathbf{x}$ that obeys our complementary slackness conditions as another 
-	\emph{restricted} linear program. Define the sets $A = \{v\ |\ A^{v}\mathbf{y} = c_v\}$ and 
-	$B = \{u\ |\ y_u = 0\}$. So $A$ tells us which dual constraints (5) are tight, 
-	given the solution $\mathbf{y}$, and $B$ tells us which $y_u$ are 0. What we want to do is 
+	\emph{restricted} linear program. Define the sets $A = \{j\ |\ A^{j}\mathbf{y} = c_j\}$ and 
+	$B = \{i\ |\ y_i = 0\}$. So $A$ tells us which dual constraints (5) are tight, 
+	given the solution $\mathbf{y}$, and $B$ tells us which $y_i$ are 0. What we want to do is 
 	give a linear program to find a solution $\mathbf{x}$ that minimizes the 
-	``violation'' of the complementary slackness conditions and the primal constraints. We will 
-	have slack variables $s_u$ which will describe the difference between $A_u\mathbf{x}$ and $b_u$ 
-	for $u\notin A$. We do this because we want to look at all $y_u > 0$ where the we do not 
-	have that $A_u\mathbf{x} = b_u$. So part of our objective function will be to minimize the 
-	sum of these $s_u$. We also want to minimize the sum over variables $x_j$ where $j\notin J$. 
+	``violation'' of the complementary slackness conditions and the primal constraints, and to do 
+	so we will index our variables by these sets. We will 
+	have slack variables $s_i$ which will describe the difference between $A_i\mathbf{x}$ and $b_i$ 
+	for $i\notin A$. We do this because we want to look at all $y_i > 0$ where the we do not 
+	have that $A_i\mathbf{x} = b_i$. So part of our objective function will be to minimize the 
+	sum of these $s_i$. We also want to minimize the sum over variables $x_j$ where $j\notin A$. 
 	This is because we want to see if there are any $x_j$ such that $A^{j}\mathbf{y} \neq c_j$. 
 	So we give the following restricted primal linear program:
 	\begin{alignat}{3}
-		& \text{minimize } & \sum_{i\notin I} s_i + \sum_{j\notin J} x_j & \\
-		& \text{subject to } & A_i\mathbf{x} & \geq b_i & \quad i\in I &, \\
-				     && A_i\mathbf{x} - b_i & = s_i & \quad i\notin I &, \\
+		& \text{minimize } & \sum_{i\notin B} s_i + \sum_{j\notin A} x_j & \\
+		& \text{subject to } & A_i\mathbf{x} & \geq b_i & \quad i\in B &, \\
+				     && A_i\mathbf{x} - b_i & = s_i & \quad i\notin B &, \\
 				     && \mathbf{x} & \geq 0, \\
 				     && \mathbf{s} & \geq 0.
 	\end{alignat}
@@ -181,10 +182,10 @@
 	We can consider the dual of the restricted primal:
 	\begin{alignat}{3}
 		& \text{maximize } & \mathbf{b}^{T}\mathbf{w} & \\
-		& \text{subject to } & A^{j}\mathbf{w} & \leq 0 & \quad j\in J &, \\
-				     && A^{j}\mathbf{w} & \leq 1 & \quad j\notin J &, \\
-				     && y_i\' & \geq -1 & \quad i\notin I &, \\
-				     && y_i\' & \geq 0 & \quad i\in I &.
+		& \text{subject to } & A^{j}\mathbf{w} & \leq 0 & \quad j\in A &, \\
+				     && A^{j}\mathbf{w} & \leq 1 & \quad j\notin A &, \\
+				     && w_i\' & \geq -1 & \quad i\notin B &, \\
+				     && w_i\' & \geq 0 & \quad i\in B &.
 	\end{alignat}
 	What we want here is to improve our dual solution. By assumption, the optimal solution to this 
 	linear program's primal is greater than 0, so we know that this dual has a solution 
@@ -202,13 +203,13 @@
 	$w_i < 0$ since this could potentially violate the inequality. Solving in this way, we get 
 	a first bound on $\epsilon$:
 	\[
-		\epsilon \leq \min_{i\in I: w_i < 0} (-y_i/w_i).
+		\epsilon \leq \min_{i\in B: w_i < 0} (-y_i/w_i).
 	\]
 	Now let's address the second inequality. When $A^{T}_jw \leq 0$, we are defintely okay. We 
 	need to be careful about violating the constraint when $A^{T}w > 0$. Thus, we can calculate a 
 	second bound on $\epsilon$:
 	\[
-		\epsilon \leq \min_{j\in J: A^{T}_jw > 0} \frac{c_j-A^{T}_jy}{A^{T}_j w}.
+		\epsilon \leq \min_{j\in A: A^{T}_jw > 0} \frac{c_j-A^{T}_jy}{A^{T}_j w}.
 	\]
 	If we choose the lower of these two $\epsilon$ values, we obtain a new feasible dual solution 
 	that has greater objective value. We can then work by reiterating the procedure, with the hope 
@@ -234,74 +235,74 @@
 	same method can be used for the case in which we want a maximimum matching. So the primal 
 	linear program for a minimum weight perfect matching on a bipartite graph is given as follows. 
 	\begin{alignat}{3}
-		& \text{minimize } & \sum_{i,j} c_{ij} x_{ij}& \\
-		& \text{subject to } \quad & \sum_{j} x_{ij} & \geq 1, & \quad \forall i\in L&, \\
-				     &\quad & \sum_{i} x_{ij} & \geq 1, & \quad \forall j\in R &, \\
-				&& x_{ij} & \in \{0,1\}.
+		& \text{minimize } & \sum_{u,v} c_{uv} x_{uv}& \\
+		& \text{subject to } \quad & \sum_{v} x_{uv} & \geq 1, & \quad \forall u\in U&, \\
+				     &\quad & \sum_{u} x_{uv} & \geq 1, & \quad \forall v\in V &, \\
+				&& x_{uv} & \geq 0.
 	\end{alignat}
 	Its dual is
 	\begin{alignat}{3}
-		& \text{maximize } & \sum_{i}u_i + \sum_jv_j& \\
-		& \text{subject to } \quad & u_i + v_j & \leq c_{ij} & \quad \forall 
-					i\in L,\ j\in R &, \\
-				    && u_i,v_j & \in \{0,1\}.
+		& \text{maximize } & \sum_{u}y_u + \sum_{v}y_v & \\
+		& \text{subject to } \quad & y_u + y_v & \leq c_{uv} & \quad \forall 
+					u\in U,\ v\in V &, \\
+				    && y_u,y_v & \geq 0.
 	\end{alignat}
 	We need to start with a dual feasible solution, and try to find a primal solution that 
 	minimizes the violation of the constraints and slackness conditions. We can start with the 
-	trivial dual solution of $u_i,v_j = 0$ for all $i,j$. Let's now think about our primal 
-	complementary slackness. The set $J$ is given by $\{(i,j)\in E\ :\ u_i + v_j = c_{ij}\}$. 
+	trivial dual solution of $y_u,y_v = 0$ for all $u,v$. Let's now think about our primal 
+	complementary slackness. The set $A$ is given by $\{(u,v)\in E\ :\ y_u + y_v = c_{uv}\}$. 
 	We know that these are the edges we want to include in our matching, and since we know our 
 	linear program has integer solutions at extreme points of the polyhedron, let's specify that 
-	$x_{ij} = 0$ for $(i,j)\notin J$. Now, our other slackness variables $s_i,s_j$ look like 
+	$x_{uv} = 0$ for $(u,v)\notin a$. Now, our other slackness variables $s_u,s_v$ look like 
 	\begin{align*}
-		\sum_{j:(i,j)\in E} x_{ij} - s_i &= 1 \\
-		\sum_{i:(i,j)\in E} x_{ij} - s_j &= 1.
+		\sum_{v:(u,v)\in E} x_{uv} - s_u &= 1 \\
+		\sum_{u:(u,v)\in E} x_{uv} - s_v &= 1.
 	\end{align*}
-	So we want to minimize over the sum of $s_i$ and $s_j$. Note that at this point, our set $I$ 
+	So we want to minimize over the sum of $s_u$ and $s_v$. Note that at this point, our set $B$ 
 	consists of all vertices. So our restricted primal linear program is
 	\begin{alignat}{3}
-		& \text{minimize } & \sum_{i\in L} s_i + \sum_{j\in R} s_j & \\
-		& \text{subject to } & \sum_j x_{ij} - s_i & = 1 & \quad \forall i &, \\
-				     && \sum_i x_{ij} - s_j & = 1 & \quad \forall j &, \\
-				     && x_{ij} & = 0 & \quad (i,j)\notin J, \\
-				     && x_{ij} & \geq 0 & \quad (i,j)\in J, \\
+		& \text{minimize } & \sum_{u\in U} s_u + \sum_{v\in v} s_v & \\
+		& \text{subject to } & \sum_v x_{uv} - s_u & = 1 & \quad \forall u &, \\
+				     && \sum_u x_{uv} - s_v & = 1 & \quad \forall v &, \\
+				     && x_{uv} & = 0 & \quad (u,v)\notin A, \\
+				     && x_{uv} & \geq 0 & \quad (u,v)\in A, \\
 				     && \mathbf{s} & \geq 0.
 	\end{alignat}
 	Let's first observe that all components of this restricted primal take on values 0 or 1, as 
 	in the original primal. Moreover, note that we have turned a weighted problem into an 
 	unweighted combinatorial problem. We've specified that we are not including any edge 
-	$(i,j)\notin J$ in our matching, and we are trying to include as many $(i,j)\in J$ as possible 
-	in our matching by minimizing the slackness variables. Note that the graph $G^{'} = (L,R,J)$ 
+	$(u,v)\notin A$ in our matching, and we are trying to include as many $(u,v)\in A$ as possible 
+	in our matching by minimizing the slackness variables. Note that the graph $G^{'} = (U,V,J)$ 
 	is exactly the equality subgraph as defined in the previous chapter! In our Hungarian algorithm 
 	we repeatedly sought to find maximum cardinality matchings within this subgraph, which is 
 	exactly what this restricted primal is having us do. This tells us that the problems of maximum 
 	weight matching and minimum weight matching only differ in the labeling we are specifying. The 
 	underlying procedure for solving both of the problems is essentially the same. So if we find a 
 	perfect matching in $G^{'}$, we will have found an $\mathbf{x}$ that obeys the complementary 
-	slackness conditions, i.e. $\sum_i s_i + \sum_j s_j = 0$. Moreover, this implies that the 
-	dual solution $\sum_i u_i + \sum_j v_j$ must be optimal as well.\\
-	Now, if the solution $\sum_i s_i + \sum_j s_j > 0$, we do not have an optimal $\mathbf{x}$, 
+	slackness conditions, i.e. $\sum_u s_u + \sum_v s_v = 0$. Moreover, this implies that the 
+	dual solution $\sum_u y_u + \sum_v y_v$ must be optimal as well.\\
+	Now, if the solution $\sum_u s_u + \sum_v s_v > 0$, we do not have an optimal $\mathbf{x}$, 
 	so we need to adjust our dual. We look at this now, in the dual linear program of the 
 	restricted primal.
 	\begin{alignat}{3}
-		& \text{maximize } & \sum_{i\in L} w_i + \sum_{j\in R} w_j & \\
-		& \text{subject to } & w_i + w_j & \leq 0 & \quad \forall (i,j)\in J &, \\
-				     && w_i + w_j & \leq 1 & \quad \forall (i,j)\notin J &, \\
-				     && w_i,w_j & \geq -1 & \quad i,j\notin I, \\
-				     && w_i,w_j & \geq 0 & \quad i,j\in I, \\
-				     && \mathbf{s} & \geq 0.
+		& \text{maximize } & \sum_{u\in U} w_u + \sum_{v\in V} w_v & \\
+		& \text{subject to } & w_u + w_v & \leq 0 & \quad \forall (u,v)\in A &, \\
+				     && w_u + w_v & \leq 1 & \quad \forall (u,v)\notin A &, \\
+				     && w_u,w_v & \geq -1 & \quad u,v\notin B, \\
+				     && w_u,w_v & \geq 0 & \quad u,v\in B, \\
+				     && \mathbf{w} & \geq 0.
 	\end{alignat}
-	We now want to find an $\epsilon$ such that the solution $z = \sum_i u_i + \sum_j v_j + 
-	\epsilon (\sum_i w_i + \sum_j w_j)$ is (1) feasible and (2) an improvement of the dual 
+	We now want to find an $\epsilon$ such that the solution $z = \sum_u y_u + \sum_v y_v + 
+	\epsilon (\sum_u w_u + \sum_v w_v)$ is (1) feasible and (2) an improvement of the dual 
 	objective. First of all, we know that since the restricted primal has solution $\geq 0$, 
 	the solution to this dual will also be $\geq 0$. So we just need to worry about the condition 
 	\[
-		u_i + v_j + \epsilon (w_i + w_j) \leq c_{ij}.
+		y_u + y_v + \epsilon (w_u + w_v) \leq c_{uv}.
 	\]
-	So we get that we at least need that $\epsilon \leq \min_{(i,j)\notin J: w_i + w_j > 0}
-	\frac{c_{ij} - u_i - v_j}{w_i + w_j}$. We can refine this by noting that since 
-	$0 < w_i + w_j \leq 1$ for $(i,j)\notin J$, we have $\epsilon = \min_{(i,j)\notin J} 
-	(c_{ij} - u_i - v_j)$. Note that the negative of this is exactly the quantity we modify our 
+	So we get that we at least need that $\epsilon \leq \min_{(u,v)\notin A: w_u + w_v > 0}
+	\frac{c_{uv} - y_u - y_v}{w_u + w_v}$. We can refine this by noting that since 
+	$0 < w_u + w_v \leq 1$ for $(u,v)\notin A$, we have $\epsilon = \min_{(u,v)\notin A} 
+	(c_{uv} - y_u - y_v)$. Note that the negative of this is exactly the quantity we modify our 
 	labeling by in the Hungarian algorithm in the previous chapter. Thus we've found an 
 	$\epsilon$ that maintains dual feasibility, and increases the objectie function. We can use 
 	this solution and revisit the restricted primal in order to look for an improved feasible 
