@@ -99,7 +99,7 @@ a maximum matching.
 	Fix a bidder $b$, and let good $g$ be such that $b = owner_g$. Let $g\'$ be the good assigned 
 	to $b$ in $M\'$. (Note: these could be \emph{null}, in which case we adopt the convention of 
 	assigning their weights and prices to be zero.) Since $b$ is $\delta$-happy, we have that 
-	$\delta + w_{bg} - p_g \geq w_{bg} - p_g$. Now let's summ over all $b$ to get 
+	$\delta + w_{bg} - p_g \geq w_{bg} - p_g$. Now let's sum over all $b$ to get 
 	\[
 		\sum_{b=owner_g} (\delta + w_{bg} - p_g) \geq \sum_{(b,g\')\in M\'} (w_{bg\'} - p_g).
 	\]
@@ -111,5 +111,21 @@ a maximum matching.
 	\]
 	But $\sum_{b=owner_g} \delta \leq n\delta$, which gives us what we want.
 \end{proof}
+
+Let's think about how this algorithm relates to the corresponding primal and dual linear programs. 
+First, note that this algorithm maintains primal feasibility at all times. However, at no point are we 
+maintaining dual feasibility. We can define the price on bidders $b$ as $p_b = 0$ for all $b$. 
+Furthermore, the prices on goods $p_g$ never exceeds $\max_{b} w_{bg}$. These $p_b$ and $p_g$ are 
+the corresponding dual variables in the linear program, so we never have that $p_b + p_g \geq w_{bg}$. 
+It is still useful to think about the linear program since, although infeasible as a dual solution, 
+we our final price vector $\mathbf{p}$ is the pointwise minimum such that all bidders are $\delta$-
+happy. So the algorithm is still performing a minimization over $\sum_b p_b + \sum_g p_g = \sum_g p_g$, 
+but relaxing the constraint that $p_b + p_g = p_g \geq w_{bg}$.\\
+Note that this algorithm function as an accurate model of real-worl multi-item auctions. When potential 
+buyers try to outbid each other, a rational agent outbids another bidder by as small an amount they 
+think will still put the other bidder out of the running. Correspondingly, we choose $\delta$ to mimick 
+this process. Larger values of $\delta$ will speed up the algorithm, but will only offer approximate 
+solutions, which may be good enough when the auction size is in the thousands, or tens of thousands of 
+items.
 
 \end{document}
