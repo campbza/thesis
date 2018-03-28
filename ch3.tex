@@ -114,14 +114,14 @@ a maximum matching.
 
 Let's think about how this algorithm relates to the corresponding primal and dual linear programs. 
 First, note that this algorithm maintains primal feasibility at all times. However, at no point are we 
-maintaining dual feasibility. We can define the price on bidders $b$ as $p_b = 0$ for all $b$. 
-Furthermore, the prices on goods $p_g$ never exceeds $\max_{b} w_{bg}$. These $p_b$ and $p_g$ are 
+maintaining dual feasibility. We can define the ``price'' on bidders $b$ as $p_b = 0$ for all $b$. 
+Furthermore, the prices on goods $p_g$ never exceeds $\max_{b} \{w_{bg}\}$. These $p_b$ and $p_g$ are 
 the corresponding dual variables in the linear program, so we never have that $p_b + p_g \geq w_{bg}$. 
 It is still useful to think about the linear program since, although infeasible as a dual solution, 
 we our final price vector $\mathbf{p}$ is the pointwise minimum such that all bidders are $\delta$-
 happy. So the algorithm is still performing a minimization over $\sum_b p_b + \sum_g p_g = \sum_g p_g$, 
 but relaxing the constraint that $p_b + p_g = p_g \geq w_{bg}$.\\
-Note that this algorithm function as an accurate model of real-worl multi-item auctions. When potential 
+Note that this algorithm functions as an accurate model of real-worl multi-item auctions. When potential 
 buyers try to outbid each other, a rational agent outbids another bidder by as small an amount they 
 think will still put the other bidder out of the running. Correspondingly, we choose $\delta$ to mimick 
 this process. Larger values of $\delta$ will speed up the algorithm, but will only offer approximate 

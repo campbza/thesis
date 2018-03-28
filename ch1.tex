@@ -37,6 +37,17 @@
 
 \maketitle
 
+\begin{section}{Introduction}
+	This thesis is aimed at those who have taken a course in algorithms, especially one in which 
+	network flows, and the max-flow/min-cut theorem were discussed. In this introductory chapter 
+	I will review these topics more briefly, and discuss their relevance to this thesis. 
+	We are not discussing flows or cuts in this thesis (although much of the work done in this 
+	thesis has a shifted frame of reference via flows), but their relevance will be made clear. 
+	The most important thing for the reader to have is a curiosity about the max-flow/min-cut 
+	theorem; there is a lot of cool math behind it, and we demonstrate that math in other settings. 
+	Specifically, we look at this relationship in weighted bipartite matchings.
+\end{section}
+
 \begin{section}{Bipartite graphs and matchings}
 
 	Throughout this thesis we will be interested in a specific subclass of graphs known as 
@@ -466,14 +477,14 @@
 	\begin{definition}{(Dual)}
 		Let 
 		\begin{alignat*}{2}
-			& \text{maximize} & \mathbf{c}^{T}\mathbf{x} \\
+			& \text{maximize } & \mathbf{c}^{T}\mathbf{x} \\
 			& \text{subject to } & A\mathbf{x} & \leq \mathbf{b} \\
 			&& \mathbf{x} &\geq 0
 		\end{alignat*}
 		be our linear program, which we will call the \emph{primal} linear program. Then we 
 		define the \emph{dual} of this linear program to be the linear program
 		\begin{alignat*}{2}
-			& \text{minimize} & \mathbf{b}^{T}\mathbf{y} \\
+			& \text{minimize } & \mathbf{b}^{T}\mathbf{y} \\
 			& \text{subject to } & A^{T}\mathbf{y} & \leq \mathbf{c} \\
 			&& \mathbf{y} &\geq 0
 		\end{alignat*}
@@ -553,7 +564,7 @@
 	\end{alignat}
 	Then the dual is
 	\begin{alignat}{3}
-		& \text{minimize } & \sum_{u,v} (y_u + y_v)& \\
+		& \text{minimize } & \sum_{u} y_u + \sum_v y_v& \\
 		& \text{subject to } \quad & y_u + y_v & \geq w_{uv} & \quad \forall u,v &, \\
 				    && y_u,y_v & \geq 0.
 	\end{alignat}
@@ -566,6 +577,88 @@
 	understand the structure of the matching problem, and how it relates to the vertex cover 
 	problem. We are not developing tools to \emph{solve} these linear programs.
 	We will use these linear programs to motivate the algorithms given in the next section. 
+\end{section}
+
+\begin{section}{Revisiting a familiar problem - max-flow/min cut}
+	Here we demonstrate that a common problem discussed in algorithms courses, and a quite 
+	amazing theorem, is really a special case of what we've been discussing. Recall that a 
+	flow network is defined as follows.
+	\begin{definition}{(Flow network)}
+		A \emph{flow network} $G = (V,E)$ is a directed graph in which each edge $(u,v)\in E$ 
+		has nonnegative \emph{capacity} $c_{uv} \geq 0$. Furthermore, there are two 
+		vertices, a source $s$ and a sink $t$. We assume that every $v\in V$ lies in 
+		some path $s\to \cdots \to v\to \cdots \to t$.
+	\end{definition}
+	\begin{definition}{(Flow)}
+		Let $G = (V,E)$ be a flow network. A \emph{flow} in $G$ is a function $f: V\times V \to 
+		\R$ that satisfies the following:
+		\begin{itemize}
+			\item Capacity constraint: For all $u,v\in V$, $0\leq f(u,v) \leq 
+				c_{uv}$.
+			\item Conservation: For all $u\in V\setminus \{s,t\}$, we have 
+				\[
+					\sum _{v\in V} f(v,u) = \sum_{v\in V} f(u,v).
+				\]
+				This says that for all vertices $v$ except our source and sink, the 
+				flow out of $v$ is equal to the flow into $v$. 
+		\end{itemize}
+		We define the value of the flow $val(f) = \sum_{v\in V} f(s,v) - \sum_{v\in V} f(v,s)$, 
+		which is just the flow out of our source minus the flow into our source.
+	\end{definition}
+	The problem as demonstrated in a typical algorithms course is to find a maximum flow from $s$ 
+	to $t$. This is done using a method developed by Ford and Fulkerson which does what $ALG 1$ 
+	does, but in a residual graph (essentially the subgraph where the flows $f(u,v) < c_{uv}$, we 
+	refer the reader to [CITE CLRS] for more detail). \\
+	Now, we recal the definition of a cut in a flow network.
+	\begin{definition}{(Cut)}
+		A \emph{cut} $(S,T)$ of a flow network $G=(V,E)$ is a partition of $V$ into sets $S$ 
+		and $T = V\setminus S$ such that $s\in S$ and $t\in T$. Given a flow $f$, the 
+		\emph{net flow} $f(S,T)$ across the cut $(S,T)$ is defined as 
+		\[
+			f(S,T) = \sum_{u\in S} \sum_{v\in T} f(u,v) - \sum_{u\in S} \sum_{v\in T} 
+			f(v,u).
+		\]
+		Finally, the \emph{capacity} of the cut is $c(S,T) = 
+		\sum_{u\in S} \sum_{v\in T} c(u,v)$. A minimum cut has capacity less than or equal to 
+		all other cuts in the network/
+	\end{definition}
+	One of the coolest and most surpising theorems in an algorithms corse is that, given a flow 
+	network $G$, the value of the maximum flow ($val(f)$) is equal to the capacity of the minimum 
+	$S,T$ cut of $G$.\\
+	Our goal now is to build up to this same theorem using the tools developed in this chapter. 
+	What follows is due to [CITE VAZIRANI]. We will first give a linear program for the 
+	maximum flow problem. To make things simpler, let's introduce an arc of infinite capacity 
+	from the sink $t$ to the source $s$; this converts this to a circulation, with the objective to 
+	maximize the flow $f(t,s)$. This allows us to enforce flow conservation at $s$ and $t$ as well, 
+	which makes the corresponding linear program simpler. The linear program is as follows.
+	\begin{alignat*}{3}
+		& \text{maximize } & f(t,s)\\
+		& \text{subject to } & f(u,v) &\leq c_{uv}, &\quad (u,v)&\in E\\ 
+				     && \sum_{v:(v,u)\in E} f(v,u) & \leq \sum_{v:(u,v)\in E} f(u,v), &
+				     	\quad u\in V &\\
+				     && f(u,v) &\geq 0 &\quad (u,v)\in E &.
+	\end{alignat*}
+	It is not immediately obvious why the second set of inequalities implies flow conservation; all 
+	it seems to say is that for each $u$, the total flow into $u$ is at most the total flow out 
+	of $u$. However, note that if this holds for all $u$, we in fact have equality of incoming and 
+	outgoing flow, since a deficit of flow at some $u$ implies a flow surplus at some $v$. So 
+	this does in fact give us conservation of flow. Now we want to find the dual of this program. 
+	Our sense (hopefully) is that the dual will somehow relate to minimum cuts, given the 
+	foreshadowing of the previous section. Let's see! We introduce variables $d_{uv}$ and $p_u$ for 
+	each type of inequality in the primal.
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{(u,v)\in E} c_{uv} d_{uv}& \\
+		& \text{subject to } \quad & d_{uv} - p_u + p_v & \geq 0, & \quad (u,v)\in E &, \\
+				    && p_s - p_t & \geq 1, & \\
+				    && d_{uv} & \geq 0, & \quad (u,v) \in E &.
+	\end{alignat}
+	It is known that extreme point solutions to these linear programs takes on values 0 or 1 at 
+	each coordinate. Let consider an optimal dual solution $(\mathbf{d}^{*},\mathbf{p}^{*})$. 
+	First, in order to satisfy $p_s^{*} - p_{t}^{*} \geq 1$ with 0,1 values, it must be the case 
+	that $p_s^{*} = 1$ and $p_t^{*} = 0$. This motivates an $s-t$ cut $(S,T)$ with $S$ consisting 
+	of nodes with value 1, and $T$ the nodes with value zero. For an edge $(u,v)$ such that 
+	$u\in S$ and $v\in T$, we have that $p_u^{*} = 1$ and $p_v^{*} = 0$, so by the first constraint 
+	$d_{uv} = 1$. 
 \end{section}
 
 \begin{section}{The Hungarian algorithm}
