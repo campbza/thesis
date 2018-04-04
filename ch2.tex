@@ -37,341 +37,331 @@
 
 \maketitle
 
-\begin{section}{The Hungarian algorithm}
-	In this section we use the motivation of the linear programs to develop an algorithm for 
-	simultaneously solving the maximum weight matching and minimum weight vertex cover problems.
-	Our algorithm works by taking every exposed node on the left, and from each such  node building 
-	a collection of alternating paths. We define this collection formally.
-	\begin{definition}{(Alternating tree)}
-		Let $G = (U,V,E)$ be a bipartite graph, and $M$ a matching on $G$. An 
-		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
-		conditions:
-		\begin{itemize}
-			\item the tree contains exactly one node $u\in U$. We call $u$ the 
-				\emph{root} of the tree.
-			\item all paths between the root and any other node in the tree are 
-				alternating paths.
-		\end{itemize}
+This chapter aims to describe fundamental relationships between combinatorial optimization problems 
+and linear programming. 
+
+\begin{section}{The vertex cover problem}
+	We begin this section by defininig a new problem. Again, this is a problem on graphs in 
+	general, but we will be restricting our attention to bipartite graphs. This is a good idea 
+	for many reasons, but the most pertinent reason is that this problem is NP-complete in the 
+	general case.
+
+	\begin{definition}{(Vertex cover)}
+		Let $G = (U,V,E)$ be a bipartite graph. A subset $C\subset U\cup V$ is said to be a 
+		\emph{vertex cover} if for each $(u,v)\in E$ we have that at least one of $u,v \in C$.
+		$C$ is a \emph{minimum} vertex cover if for any other cover $C\'$, $|C|\leq |C\'|$.
 	\end{definition}
+	Using what we've already learned, we can specify at least one relation between matchings and 
+	vertex covers: namely, the set of all vertices of all edges in any maximal matching on a graph 
+	forms a vertex cover. Figure 1 shows some examples of vertex covers on the graph we looked at 
+	in the previous chapter.
+
 	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
 		
 		%left nodes
-		\node (n1) at (1,10) {A};
-		\node (n2) at (1,8) {B};
-		\node (n3) at (1,6) {C};
-		\node (n4) at (1,4) {D};
-		\node (n5) at (1,2) {E};
+		\node[fill=black!20] (n1) at (1,10) {A};
+		\node[fill=black!20] (n2) at (1,8) {B};
+		\node[fill=black!20] (n3) at (1,6) {C};
+		\node[fill=black!20] (n4) at (1,4) {D};
 
 		%right nodes
-		\node (n6) at (4,10) {F};
-		\node (n7) at (4,8) {G};
-		\node (n8) at (4,6) {H};
-		\node (n9) at (4,4) {I};
-		\node (n10) at (4,2) {J};
+		\node (n5) at (4,10) {E};
+		\node (n6) at (4, 8) {F};
+		\node[fill=black!20] (n7) at (4, 6) {G};
 		
 		%edges
-		\draw[red] (n1) -- (n6);
-		\draw (n1) -- (n8);
+		\draw (n1) -- (n5);
+		\draw (n1) -- (n7);
+		\draw (n2) -- (n5);
 		\draw (n2) -- (n6);
-		\draw (n2) -- (n7);
-		\draw (n3) -- (n6);
-		\draw[red] (n4) -- (n7);
-		\draw (n4) -- (n8);
-		\draw (n2) -- (n9);
-		\draw[red] (n5) -- (n9);
-		\draw (n5) -- (n10);
+		\draw (n3) -- (n5);
+		\draw (n4) -- (n6);
+		\draw (n4) -- (n7);
 
-		%alternating tree
-		\node (n11) at (7,6) {B};
-		\node (n12) at (9,8) {F};
-		\node (n13) at (9,6) {G};
-		\node (n14) at (9,4) {I};
-		\node (n15) at (11,8) {A};
-		\node (n16) at (11,6) {D};
-		\node (n17) at (11,4) {E};
-		\node (n18) at (13,8) {H};
-		\node (n20) at (13,4) {J};
+		%left nodes
+		\node (m1) at (7,10) {A};
+		\node (m2) at (7,8) {B};
+		\node (m3) at (7,6) {C};
+		\node (m4) at (7,4) {D};
 
-		%tree edges
-		\draw (n11) -- (n12);
-		\draw (n11) -- (n13);
-		\draw (n11) -- (n14);
-		\draw[red] (n12) -- (n15);
-		\draw[red] (n13) -- (n16);
-		\draw[red] (n14) -- (n17);
-		\draw (n15) -- (n18);
-		\draw (n17) -- (n20);
+		%right nodes
+		\node[fill=black!20] (m5) at (10,10) {E};
+		\node[fill=black!20] (m6) at (10, 8) {F};
+		\node[fill=black!20] (m7) at (10, 6) {G};
+		
+		%edges
+		\draw (m1) -- (m5);
+		\draw (m1) -- (m7);
+		\draw (m2) -- (m5);
+		\draw (m2) -- (m6);
+		\draw (m3) -- (m5);
+		\draw (m4) -- (m6);
+		\draw (m4) -- (m7);
+
 		\end{tikzpicture}
-		\caption{Bipartite graph with matching, corresponding alternating tree rooted at 
-		vertex $B$.}
+		\caption{Examples of vertex covers}
 	\end{figure}
-	Let's remind ourselves what the primal-dual linear programs
-	motivate. We want to minimize $\sum w_{uv}$, and maximize $\sum (y_u + y_v)$. Moreover, 
-	we want optimal solutions such that $\sum w_{uv} = \sum (y_u + y_v)$. For our primal, we are 
-	keeping track of edge weights. For the dual, we will be keeping track of a ``labeling'' on 
-	vertices, given by the $y_u$ and $y_v$ values. We define what a labeling is now.
+	You can convince yourself that the cover on the right is a minimum cover. This brings us 
+	to an important theorem. We first prove a lemma.
 
-	\begin{definition}{(Labeling)}
-		A \emph{vertex labeling} on a weighted bipartite graph $G = (U,V,E)$ is a function 
-		$l: U\cup V \to \N$. We call the labeling \emph{feasible} if for all $u\in U$ and 
-		$v\in V$, $l(u) + l(v) \geq w_{uv}$.
-	\end{definition}
-	This labeling corresponds to our dual variables; i.e. a feasible labeling is a feasible dual 
-	solution. It will be helpful us to look at a certain subset of our graph where the labeling 
-	is exact ($l(u) + l(v) - w_{uv} = 0$).
-	\begin{definition}{(Equality subgraph)}
-		The \emph{equality subgraph} of $G = (U,V,E)$ is the graph $G_l = (U,V,E_l)$, 
-		where 
-		\[
-			E_l = \{(u,v)\ :\ l(u) + l(v) = w_{uv}\}.
-		\]
-	\end{definition}
-	In Figure 5 we show a bipartite graph along with its corresponding equality graph.
-	\begin{figure}[h]
-		\centering
-		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
-			%left nodes
-			\node [label=left:{1}] (n1) at (1,10) {A};
-			\node [label=left:{1}] (n2) at (1,6) {B};
-			\node [label=left:{1}] (n3) at (1,2) {C};
-
-			%right nodes
-			\node [label=right:{2}] (n4) at (5,10) {D};
-			\node [label=right:{1}] (n5) at (5,6) {E};
-			\node [label=right:{2}] (n6) at (5,2) {F};
-
-			%edges
-			\draw (n1) -- node[near start,draw=none,above] {3} ++(n4);
-			\draw (n1) -- node[near start,draw=none,above] {2} ++(n5);
-			\draw (n1) -- node[near end,draw=none,below] {3} ++(n6);
-
-			\draw (n2) -- node[near end,draw=none,above] {1} ++(n4);
-			\draw (n2) -- node[near start,draw=none,above] {2} ++(n5);
-			\draw (n2) -- node[near end,draw=none,below] {0} ++(n6);
-
-			\draw (n3) -- node[near start,draw=none,below] {3} ++(n4);
-			\draw (n3) -- node[near start,draw=none,below] {2} ++(n5);
-			\draw (n3) -- node[near end,draw=none,below] {1} ++(n6);
-
-
-			%left nodes
-			\node [label=left:{1}] (n7) at (10,10) {A};
-			\node [label=left:{1}] (n8) at (10,6) {B};
-			\node [label=left:{1}] (n9) at (10,2) {C};
-
-			%right nodes
-			\node [label=right:{2}] (n10) at (14,10) {D};
-			\node [label=right:{1}] (n11) at (14,6) {E};
-			\node [label=right:{2}] (n12) at (14,2) {2};
-
-			%edges
-			\draw (n7) -- node[near start,draw=none,above] {3} ++(n10);
-			\draw (n7) -- node[near start,draw=none,above] {2} ++(n11);
-			\draw (n7) -- node[near end,draw=none,below] {3} ++(n12);
-
-			\draw (n8) -- node[near start,draw=none,above] {2} ++(n11);
-
-			\draw (n9) -- node[near start,draw=none,below] {3} ++(n10);
-			\draw (n9) -- node[near start,draw=none,below] {2} ++(n11);
-		\end{tikzpicture}
-		\caption{A weighted bipartite graph and its corresponding equality subgraph.}
-	\end{figure}
-	\begin{theorem}{(Kuhn-Munkres)}
-		If $l$ is a feasible labeling and $M$ is a perfect matching in $G_l$ then $M$ is a 
-		max-weight matching.
-	\end{theorem}
-
-	\begin{proof}
-		Let $M\'$ be a perfect matching in $G$. Since every $u\in U\cup V$ is matched 
-		by exactly one edge in $M\'$, then 
-		\[
-			\sum_{(u,v)\in M\'} w_{uv} \leq \sum_{(u,v)\in M\'} (l(u)+l(v)) = 
-			\sum_{w\in U\cup V} l(w).
-		\]
-		This says that the sum of our label values is an upper bound on the weight of any 
-		perfect matching.
-		Now suppose that $M$ is a perfect matching in $G_l$. Then 
-		\[
-			\sum_{(u,v)\in M} w_{uv} = \sum_{w\in U\cup V} l(w).
-		\]
-		So $\sum_{(u,v)\in M\'} w_{uv} \leq \sum_{(u,v)\in M}$, meaning $M$ must be maximum 
-		weight.
-	\end{proof}
-
-	\begin{lemma}{2}
-		Let $S\subseteq U$ and $T = N_l(S) \neq V$. Set 
-		\[
-			\alpha_l = \min _{u\in S,\ v\notin T} \{l(u) + l(v) - w_{uv}\}
-		\]
-		and 
-		\[
-			l\' (w) = 
-			\begin{cases}
-				l(w) - \alpha_l &\text{ if } w\in S \\
-				l(w) + \alpha_l &\text{ if } w\in T \\
-				l(w) &\text{ otherwise.}
-			\end{cases}
-		\]
-		Then $l\'$ is a feasible labeling, and 
-		\begin{enumerate}
-			\item If $(u,v)\in E_l$ for $u\in S$ and $v\in T$ then $(u,v)\in E_{l\'}$.
-			\item If $(u,v)\in E_l$ for $u\notin S$, and $v\notin T$, then $(u,v)\in 
-				E_{l\'}$.
-			\item There is some edge $(u,v)\in E_{l\'}$ for $u\in S$, $v\notin T$.
-		\end{enumerate}
+	\begin{lemma}{1}
+		Let $G=(U,V,E)$ be a bipartite graph. Let $M$ be a matching on $G$ and $C$ a cover on 
+		$G$ such that $|M| = |C|$. Then $M$ is a maximum matching and $C$ is a minimum 
+		covering.
 	\end{lemma}
 
 	\begin{proof}
-		First, we show that $l\'$ is feasible. For $u\in U$, $v\in V$, there are four 
-		possibilities:
-		\begin{itemize}
-			\item if $u\in S$ and $v\in T$ then $l\' (u) + l\' (v) = l(u) + l(v)$.
-			\item if $u\notin S$ and $v\notin T$, $l\' (u) = l(u)$ and $l\' (v) = l(v)$, 
-				so $l\' (u) + l\' (v) = l(u) + l(v)$.
-			\item if $u\in S$ and $v\notin T$, $l\' (u) - \alpha$ and $l\' (v) = l(v)$. 
-				We know $\alpha = \min_{u\in S,v\notin T} \{l(u) + l(v) - w_{uv}\}$, 
-				which means $\alpha \leq l(u) + l(v) - w_{uv}$, and thus 
-				$l\' (u) + l\' (v) \geq w_{uv}$.
-			\item if $u\notin S$ and $v\in T$, $l\' (u) = l(u)$ and $l\' (v) = l(v) + 
-				\alpha$, which is clearly feasible.
-		\end{itemize}
-		(1) and (2) follow from above. To see (3), note that there is some $(u,v)$ with 
-		$u\in S$, $v\in T$ such that $\alpha = l(u) + l(v) - w_{uv}$, so when we take 
-		$l\' (u) = l(u) - \alpha$ and $l\' (v) = l(v)$, we get 
-		\begin{align*}
-			l\' (u) + l\' (v) - w_{uv} &= l(u) - \alpha + l(v) - w_{uv} \\
-						   &= l(u) + l(v) - w_{uv} - \alpha \\
-						   &= \alpha - \alpha \\
-						   &= 0.
-		\end{align*}
-		This is exactly what it means for an edge $(u,v)$ to be in $E_l$.
+		Let $M\'$ be a maximum matching on $G$ and $C\'$ a minimum covering on $G$. For each 
+		$(u,v)\in M\'$, $C\'$ must include either $u$ or $v$, which tells us that 
+		$|M\'| \leq |C\'|$. Then we have 
+		\[
+			|M|\leq |M\'| \leq |C\'| \leq |C|.
+		\]
+		Thus, if $|M| = |C|$ we have equalities above, which means that the size of a maximum 
+		matching is equal to the size of a minimum covering.
 	\end{proof}
-	We now look at the Hungarian method for finding maximum-weight matchings on bipartite graphs. 
-	This method was originally developed by Kuhn and Munkres, who named it in honor of the Hungarian 
-	mathematicians K\H{o}nig and Egervary.\\
+
+	\begin{theorem}{(K\H{o}nig-Egervary)}
+		For any bipartite graph $G$, if $M$ is a maximum matching on $G$ and $C$ is a minimum 
+		vertex cover  on $G$, then $|M| = |C|$.
+	\end{theorem}
+	Before we prove this, we define a simple term: an $M$-alternating path is an alternating path 
+	with respect to a matching $M$.
+
+	\begin{proof}
+		Let $G=(U,V,E)$ be a bipartite graph, and let $M$ be a maximum matching on $G$. 
+		Furthermore, define
+		\[
+			A := \{s\in S\; |\; s \text{ unsaturated}\}
+		\]
+		and
+		\[
+			B := \{\text{all vertices connected to nodes in $A$ by $M$-alternating paths}\}
+			.
+		\]
+		Let $L = B\cap U$ and $R = B\cap V$. Then we have the following:
+
+		\begin{enumerate}
+			\item Every node in $R$ is saturated.
+			\item $N(L) = R$,
+		\end{enumerate}
+		where $N(L)$ denotes the set of all vertices connected to elements of $L$ (the 
+		``neighbors'' of $L$). The first claim comes from the fact that, if $M$ is a 
+		maximum matching, then our alternating paths starting at nodes in $A$ must have 
+		length $\geq 2$, and must have even length (otherwise we would have an augmenting path, 
+		which contradicts our assumption that $M$ is a maximum matching).
+		The second comes from that fact that every node in $N(L)$ is connected to vertices in 
+		$A$ by an alternating path. \\
+		Now, define $K := (U\setminus L)\cup R$. Every edge 
+		in $G$ must have one of its endpoints in $K$. If not, there there would be an 
+		edge with one end in $L$ and one end in $V\setminus R$, which contradicts 
+		$N(L) = R$. So $K$ is a covering of $G$. Moreover, $|K| = |M|$, since for each 
+		edge in $M$ we've included one of its endpoints in $K$ (the vertices we've chosen are 
+		those in $N(L)$ and those in $U\setminus L$). Thus, by the previous lemma, $K$ is 
+		a minimum covering.
+	\end{proof}
+	All of this tells us that there is a deep relationship between maximum matchings and 
+	minimum vertex covers on bipartite graphs. Given a solution to one, we can turn it into a 
+	solution to the other. This is what we seek to accomplish next. 
+\end{section}
+
+\begin{section}{Revisiting a familiar problem - max-flow/min cut}
+	Here we demonstrate that a common problem discussed in algorithms courses, and a quite 
+	amazing theorem, is really a special case of what we've been discussing. Recall that a 
+	flow network is defined as follows.
+	\begin{definition}{(Flow network)}
+		A \emph{flow network} $G = (V,E)$ is a directed graph in which each edge $(u,v)\in E$ 
+		has nonnegative \emph{capacity} $c_{uv} \geq 0$. Furthermore, there are two 
+		vertices, a source $s$ and a sink $t$. We assume that every $v\in V$ lies in 
+		some path $s\to \cdots \to v\to \cdots \to t$.
+	\end{definition}
+	\begin{definition}{(Flow)}
+		Let $G = (V,E)$ be a flow network. A \emph{flow} in $G$ is a function $f: V\times V \to 
+		\R$ that satisfies the following:
+		\begin{itemize}
+			\item Capacity constraint: For all $u,v\in V$, $0\leq f(u,v) \leq 
+				c_{uv}$.
+			\item Conservation: For all $u\in V\setminus \{s,t\}$, we have 
+				\[
+					\sum _{v\in V} f(v,u) = \sum_{v\in V} f(u,v).
+				\]
+				This says that for all vertices $v$ except our source and sink, the 
+				flow out of $v$ is equal to the flow into $v$. 
+		\end{itemize}
+		We define the value of the flow $val(f) = \sum_{v\in V} f(s,v) - \sum_{v\in V} f(v,s)$, 
+		which is just the flow out of our source minus the flow into our source.
+	\end{definition}
+	The problem as demonstrated in a typical algorithms course is to find a maximum flow from $s$ 
+	to $t$. This is done using a method developed by Ford and Fulkerson which does what $ALG 1$ 
+	does, but in a residual graph (essentially the subgraph where the flows $f(u,v) < c_{uv}$, we 
+	refer the reader to [CITE CLRS] for more detail). \\
+	Now, we recal the definition of a cut in a flow network.
+	\begin{definition}{(Cut)}
+		A \emph{cut} $(S,T)$ of a flow network $G=(V,E)$ is a partition of $V$ into sets $S$ 
+		and $T = V\setminus S$ such that $s\in S$ and $t\in T$. Given a flow $f$, the 
+		\emph{net flow} $f(S,T)$ across the cut $(S,T)$ is defined as 
+		\[
+			f(S,T) = \sum_{u\in S} \sum_{v\in T} f(u,v) - \sum_{u\in S} \sum_{v\in T} 
+			f(v,u).
+		\]
+		Finally, the \emph{capacity} of the cut is $c(S,T) = 
+		\sum_{u\in S} \sum_{v\in T} c(u,v)$. A minimum cut has capacity less than or equal to 
+		all other cuts in the network/
+	\end{definition}
+	One of the coolest and most surpising theorems in an algorithms corse is that, given a flow 
+	network $G$, the value of the maximum flow ($val(f)$) is equal to the capacity of the minimum 
+	$s-t$ cut of $G$.
+\end{section}
+
+\begin{section}{Duality theory}
+\begin{definition}{(Dual)}
+		Let 
+		\begin{alignat*}{2}
+			& \text{maximize } & \mathbf{c}^{T}\mathbf{x} \\
+			& \text{subject to } & A\mathbf{x} & \leq \mathbf{b} \\
+			&& \mathbf{x} &\geq 0
+		\end{alignat*}
+		be our linear program, which we will call the \emph{primal} linear program. Then we 
+		define the \emph{dual} of this linear program to be the linear program
+		\begin{alignat*}{2}
+			& \text{minimize } & \mathbf{b}^{T}\mathbf{y} \\
+			& \text{subject to } & A^{T}\mathbf{y} & \leq \mathbf{c} \\
+			&& \mathbf{y} &\geq 0
+		\end{alignat*}
+	\end{definition}
+	The first thing to note is that the dual of the dual is the primal. Let us introduce some 
+	notation. First, let us denote the primal maximization problem by the letter $\Gamma$, and 
+	the dual minimization problem by the letter $\Omega$. For a given linear program, we denote 
+	an optimal solution by $\mathbf{OPT}$. 
+
+	\begin{theorem}{(Weak duality)}
+		If the primal linear program (in maximization form) and the dual (in minimization 
+		form) are both feasible, then 
+		\[
+			\mathbf{OPT}(\Gamma) \leq \mathbf{OPT}(\Omega).
+		\]
+	\end{theorem}
+	What's surprising is the following theorem.
+
+	\begin{theorem}{(Strong duality)}
+		Given two linear programs $\Gamma$ and $\Omega$ that are duals of each other, if one is 
+		feasible and bounded, then so is the other. Additionally, 
+		\[
+			\mathbf{OPT}(\Gamma) = \mathbf{OPT}(\Omega).
+		\]
+	\end{theorem}
+	Our goal now is to use this duality theory to better understand the relationships between 
+	our combinatorial optimization problems.
+
+\begin{subsection}{Maximum-matching duality}
+	Let's first turn maximum matching into a linear program. Our goal is to maximize the number 
+	of edges in our matching. Our constraint is that no edge is incident to more than one edge 
+	in the matching. So for each edge $(u,v)$, we will need a corresponding $x_{uv}$. Our objective 
+	function is then pretty simple: maximize the number of $x_{uv}$. Now we need to figure out 
+	our constraint equations. For a fixed node $u\in U$, the number of edges in the matching 
+	incident 
+	to $u$ is given by $\sum_{v\in V} x_{uv}$. So we want that this is $\leq 1$. Similarly, for any 
+	node $v$, we want $\sum_{u\in U} x_{uv} \leq 1$. This gives us the following linear program.
+
+	%Maximum matching ILP%
+	\begin{alignat}{3}
+		& \text{maximize } & \sum_{u,v} x_{uv}& \\
+		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \forall u\in U&, \\
+				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad \forall v\in V &, \\
+				&& x_{uv} & \in \{0,1\}.
+	\end{alignat}
+	What we've given here is an $\emph{integer}$ linear program, since we've restricted our 
+	$x$ variables to be integers. In general, solving integer linear programs is NP-hard. However, 
+	in this case it is well know that this linear program attains integer solution at extreme 
+	of the polyhedron solution space, so we can drop the integrality requirements and just say 
+	$x_{uv} \geq 0$.\\
+	Now let's try and construct the dual of this linear program. We will need a variable 
+	$y_u$ for each vertex $u$. Similarly, we need a variable $y_v$ for each vertex $v$. Our 
+	objective will be to minimize over the sum of these $y_u,y_v$. Since our constraint 
+	in the primal is the constant vector 1, our only constraint will be that $y_u + y_v \geq 1$. 
+	This gives us the dual linear program
+
+	%Vertex cover ILP%
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{u,v} (y_u + y_v)& \\
+		& \text{subject to } \quad & y_u + y_v & \geq 1 & \quad \forall u,v &, \\
+				    && y_u,y_v & \geq 0.
+	\end{alignat}
+	This dual problem tells us that each edge must be ``covered'' by at least one of its incident 
+	vertices. This is exactly the vertex cover problem! So for unweighted bipartite graphs, the 
+	linear programs for maximum matchings and minimum vertex covers are duals of each other. 
+	We will use this insight to construct our algorithms for solving the maximum matching problem. 
 	\\
-	\textbf{The Hungarian Method}
-	\begin{enumerate}
-		\item Choose initial feasible labeling $l$ and matching $M$ in $G_l$.
-		\item If $M$ is perfect in $G_l$, we are done. Otherwise, pick exposed 
-			vertex $u\in U$. Set $S = \{u\}$, $T=\emptyset$.
-		\item If $N_l (S) = T$, update labels as in lemma (this forces $N_l (S)\neq T$).
-		\item If $N_l (S) \neq T$, pick $v\in N_l (S)\setminus T$
-			\begin{itemize}
-				\item If $v$ is exposed, $p = u\to v$ is an augmenting path. Set 
-					$M:=M\oplus p$. Go to 2.
-				\item If $v$ is matched to some $w$, expand our alternating tree. 
-					$S := S\cup \{w\}$, $T := T\cup \{v\}$. Go to 3.
-			\end{itemize}
-	\end{enumerate}
-	We now provide an example of this algorithm.
-	\begin{figure}[h]
-		\centering
-		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+	There is another version of this problem, called the \emph{maximum weight matching}. In this 
+	version, we are given a bipartite graph with non-negative edge weights $w_{uv}$ for all 
+	edges $(u,v)$. Instead of trying to maximize the number of edges in the matching, the goal 
+	is to find a matching $M$ such that $\sum_{(u,v) \in M} w_{uv}$, or the weight of the matching, 
+	is greater than the weight of any other matching. We can easily encode this problem by making 
+	a slight modification to our linear program from before. The primal is given by
+	\begin{alignat}{3}
+		& \text{maximize } & \sum_{u,v} w_{uv}x_{uv}& \\
+		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \forall u\in U&, \\
+				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad \forall v\in V &, \\
+				&& x_{uv} & \geq 0.
+	\end{alignat}
+	Then the dual is
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{u} y_u + \sum_v y_v& \\
+		& \text{subject to } \quad & y_u + y_v & \geq w_{uv} & \quad \forall u,v &, \\
+				    && y_u,y_v & \geq 0.
+	\end{alignat}
+	The dual is a sort of weighted vertex cover. One way to think about it is that each edge 
+	has a ``cost'' given by $w_{uv}$, and each of its endpoints has to pool ``money'' in order 
+	to pay at least that cost. So instead of edges being covered or not covered, there's a certain 
+	``amount'' that they have to be covered.
+\end{subsection}
 
-			%left nodes
-			\node [label=left:{6}] (n1) at (1,10) {A};
-			\node [label=left:{8}] (n2) at (1,7) {B};
-			\node [label=left:{4}] (n3) at (1,4) {C};
-
-			%right nodes
-			\node [label=right:{0}] (n4) at (4,10) {D};
-			\node [label=right:{0}] (n5) at (4,7) {E};
-			\node [label=right:{0}] (n6) at (4,4) {F};
-
-			%edges
-			\draw (n1) -- node[near start, draw=none, above] {1} ++ (n4);
-			\draw (n1) -- node[near start, draw=none, below] {6} ++ (n5);
-			\draw (n2) -- node[near start, draw=none, above] {8} ++ (n5);
-			\draw (n2) -- node[near end, draw=none, above] {6} ++ (n6);
-			\draw (n3) -- node[near end, draw=none, above] {4} ++ (n4);
-			\draw (n3) -- node[near end, draw=none, below] {1} ++ (n6);
-
-			
-			
-			%left nodes
-			\node [label=left:{6}] (m1) at (7,10) {A};
-			\node [label=left:{8}] (m2) at (7,7) {B};
-			\node [label=left:{4}] (m3) at (7,4) {C};
-
-			%right nodes
-			\node [label=right:{0}] (m4) at (10,10) {D};
-			\node [label=right:{0}] (m5) at (10,7) {E};
-			\node [label=right:{0}] (m6) at (10,4) {F};
-			
-			%edges
-			\draw (m1) -- node[near start, draw=none, below] {6} ++ (m5);
-			\draw[red] (m2) -- node[near start, draw=none, above] {8} ++ (m5);
-			\draw[red] (m3) -- node[near end, draw=none, above] {4} ++ (m4);
-		\end{tikzpicture}
-		\caption{Bipartite graph (left) and corresponding equality graph (right) with initial 
-		matching}
-	\end{figure}
-	Our initial matching is $M = \{(B,E), (C,D)\}$ (see Figure 6). Note that the current state of 
-	the graph is 
-	primal-dual feasible. Our algorithm chooses an exposed vertex in $U$, say $A$. So we have 
-	$S=\{A\}$ and $T=\emptyset$. We have that $N_l (S) \neq T$, so we find $E\in N_l (S)\setminus T
-	$. $E$ is matched, so we grow our alternating tree as follows: $S := S\cup \{B\} = \{A,B\}$, 
-	$T := T\cup \{E\} = \{E\}$. At this point $N_l (S) = T$, so we adjust our dual variables. 
-	Calculate $\alpha = \min _{u\in S,v\notin T} \{l(u) + l(v) - w_{uv}\} = 2$ from edge $(B,F)$. 
-	Our new equality graph is shown in Figure 7.
-	\begin{figure}[H]
-		\centering
-		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
-			%left nodes
-			\node [label=left:{4}] (m1) at (7,10) {A};
-			\node [label=left:{6}] (m2) at (7,7) {B};
-			\node [label=left:{4}] (m3) at (7,4) {C};
-
-			%right nodes
-			\node [label=right:{0}] (m4) at (10,10) {D};
-			\node [label=right:{2}] (m5) at (10,7) {E};
-			\node [label=right:{0}] (m6) at (10,4) {F};
-			
-			%edges
-			\draw (m1) -- node[near start, draw=none, below] {6} ++ (m5);
-			\draw[red] (m2) -- node[near start, draw=none, above] {8} ++ (m5);
-			\draw (m2) -- node[near end, draw=none, below] {6} ++ (m6);
-			\draw[red] (m3) -- node[near end, draw=none, above] {4} ++ (m4);
-		\end{tikzpicture}
-		\caption{Second equality graph.}
-	\end{figure}
-	Now, $S = \{A,B\}$ is the same, but $N_l (S) = \{E,F\}$ has changed. $T = \{E\}$, so 
-	$N_l (S) \neq T$. So we choose $F\in N_l (S)\setminus T$. $F$ is unmatched, meaning it is 
-	an endpoint of an augmenting path. In particular, $p = A,E,B,F$ is an augmenting path. Thus we 
-	improve our matching with $M := M\oplus p = \{(A,E), (B,F), (C,D)\}$. Our equality graph with 
-	the new matching is given in Figure 8.
-	\begin{figure}[H]
-		\centering
-		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
-			%left nodes
-			\node [label=left:{4}] (m1) at (7,10) {A};
-			\node [label=left:{6}] (m2) at (7,7) {B};
-			\node [label=left:{4}] (m3) at (7,4) {C};
-
-			%right nodes
-			\node [label=right:{0}] (m4) at (10,10) {D};
-			\node [label=right:{2}] (m5) at (10,7) {E};
-			\node [label=right:{0}] (m6) at (10,4) {F};
-			
-			%edges
-			\draw[red] (m1) -- node[near start, draw=none, below] {6} ++ (m5);
-			\draw (m2) -- node[near start, draw=none, above] {8} ++ (m5);
-			\draw[red] (m2) -- node[near end, draw=none, below] {6} ++ (m6);
-			\draw[red] (m3) -- node[near end, draw=none, above] {4} ++ (m4);
-		\end{tikzpicture}
-		\caption{Equality graph after augmenting.}
-	\end{figure}
-	This is a perfect matching on the equality graph, so this matching must be a maximum weight 
-	matching on the graph. We can check that the values of the primal and dual solutions agree. 
-	The sum of weights in the matching is $6+6+4 = 16$, and the sum of the values of our 
-	dual variables is $4+6+4+2 = 16$.\\
-	Note that if we want to just find a maximum cardinality matching on a bipartite graph, 
-	we can just give all edges weight 1 and run this algorithm.\\
-	This algorithm was one of the first primal-dual algorithms developed, and it anticipated many 
-	later variations on the same theme. It displays the surprising connection between combinatorial 
-	optimization and linear programming, which we explore in the next section.
+\begin{subsection}{Maximum flow duality}
+	Our goal now is to build up to this same theorem using the tools developed in this chapter. 
+	What follows is due to [CITE VAZIRANI]. We will first give a linear program for the 
+	maximum flow problem. To make things simpler, let's introduce an arc of infinite capacity 
+	from the sink $t$ to the source $s$; this converts this to a circulation, with the objective to 
+	maximize the flow $f(t,s)$. This allows us to enforce flow conservation at $s$ and $t$ as well, 
+	which makes the corresponding linear program simpler. The linear program is as follows.
+	\begin{alignat*}{3}
+		& \text{maximize } & f(t,s)\\
+		& \text{subject to } & f(u,v) &\leq c_{uv}, &\quad (u,v)&\in E\\ 
+				     && \sum_{v:(v,u)\in E} f(v,u) & \leq \sum_{v:(u,v)\in E} f(u,v), &
+				     	\quad u\in V &\\
+				     && f(u,v) &\geq 0 &\quad (u,v)\in E &.
+	\end{alignat*}
+	It is not immediately obvious why the second set of inequalities implies flow conservation; all 
+	it seems to say is that for each $u$, the total flow into $u$ is at most the total flow out 
+	of $u$. However, note that if this holds for all $u$, we in fact have equality of incoming and 
+	outgoing flow, since a deficit of flow at some $u$ implies a flow surplus at some $v$. So 
+	this does in fact give us conservation of flow. Now we want to find the dual of this program. 
+	Our sense (hopefully) is that the dual will somehow relate to minimum cuts, given the 
+	foreshadowing of the previous section. Let's see! We introduce variables $d_{uv}$ and $p_u$ for 
+	each type of inequality in the primal.
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{(u,v)\in E} c_{uv} d_{uv}& \\
+		& \text{subject to } \quad & d_{uv} - p_u + p_v & \geq 0, & \quad (u,v)\in E &, \\
+				    && p_s - p_t & \geq 1, & \\
+				    && d_{uv} & \geq 0, & \quad (u,v) \in E &.
+	\end{alignat}
+	It is known that extreme point solutions to these linear programs takes on values 0 or 1 at 
+	each coordinate. Let consider an optimal dual solution $(\mathbf{d}^{*},\mathbf{p}^{*})$. 
+	First, in order to satisfy $p_s^{*} - p_{t}^{*} \geq 1$ with 0,1 values, it must be the case 
+	that $p_s^{*} = 1$ and $p_t^{*} = 0$. This motivates an $s-t$ cut $(S,T)$ with $S$ consisting 
+	of nodes with value 1, and $T$ the nodes with value zero. For an edge $(u,v)$ such that 
+	$u\in S$ and $v\in T$, we have that $p_u^{*} = 1$ and $p_v^{*} = 0$, so by the first constraint 
+	$d_{uv}^{*} = 1$. This means that for any edge $(u,v)$ in the cut, the corresponding 
+	$d_{uv}^{*} = 1$. Note that any other $d_{uv}^{*}$ where $(u,v)$ is not in the cut, it's value 
+	can be 0 without violating the constraints (we want them to be 0 since we are minimizing our 
+	objective function). Thus the objective function's value is equal to the capacity of this 
+	$(S,T)$ cut, which must be a minimum cut. Strong duality tells us that this corresponds to the 
+	value of $f(t,s)$ in the primal linear program.\\
+	Thus, we have given an alternative formulation of the max-flow/min-cut relationship using 
+	linear programs. In this next chapter we present the main algorithm of this thesis, the 
+	Hungarian algorithm, which is interesting in itself, and also as a tool to motivate general 
+	primal-dual algorithms.
+\end{subsection}
 \end{section}
 \end{document}
