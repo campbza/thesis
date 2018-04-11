@@ -1,0 +1,16 @@
+\contentsline {chapter}{Introduction}{1}
+\contentsline {chapter}{Chapter 1: Bipartite graphs and matchings}{3}
+\contentsline {section}{\numberline {1.1}Introduction}{3}
+\contentsline {section}{\numberline {1.2}Bipartite graphs and matchings}{3}
+\contentsline {section}{\numberline {1.3}Linear programming}{7}
+\contentsline {chapter}{Chapter 2: Vertex cover, duality theory, and the max-flow/min-cut relationship}{11}
+\contentsline {section}{\numberline {2.1}The vertex cover problem}{11}
+\contentsline {section}{\numberline {2.2}Duality theory}{14}
+\contentsline {subsection}{\numberline {2.2.1}Maximum-matching duality}{15}
+\contentsline {subsection}{\numberline {2.2.2}Revisiting a familiar problem - max-flow/min-cut}{17}
+\contentsline {chapter}{Chapter 3: The Hungarian algorithm}{21}
+\contentsline {section}{\numberline {3.1}The Hungarian algorithm}{21}
+\contentsline {chapter}{Chapter 4: General primal-dual method and auction algorithms}{29}
+\contentsline {section}{\numberline {4.1}The Classical Primal-Dual Method}{29}
+\contentsline {section}{\numberline {4.2}Primal-dual method for weighted matchings}{35}
+\contentsline {section}{\numberline {4.3}Auction algorithms}{38}

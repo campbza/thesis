@@ -1,42 +1,3 @@
-\documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{clrscode3e}
-\usepackage{amsmath,amsthm,amssymb}
-\usepackage{mathtools}
-\usepackage{tikz}
-\usepackage{float}
-\usetikzlibrary{positioning,arrows}
-\usepackage{setspace}
-\usepackage{mathpazo}
-\doublespacing
-%\usepackage{tikz-berge}
-%\usepackage{algorithm}
-%\usepackage[noend]{algpseudocode}
-
- 
-\newcommand{\N}{\mathbb{N}}
-\newcommand{\Z}{\mathbb{Z}}
-\newcommand{\R}{\mathbb{R}}
-\renewcommand{\'}{^{'}}
-\renewcommand{\gets}{:=}
- 
-\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-\newenvironment{definition}[2][Definition]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-\newenvironment{problem}[2][Problem]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-\newenvironment{question}[2][Question]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
-
-\begin{document}
-\title{Chapter 2}
-\author{Zachary Campbell}
-
-\maketitle
-
 This chapter aims to describe fundamental relationships between combinatorial optimization problems 
 and linear programming. 
 
@@ -167,54 +128,6 @@ and linear programming.
 	solution to the other. This is what we seek to accomplish next. 
 \end{section}
 
-\begin{section}{Revisiting a familiar problem - max-flow/min cut}
-	Here we demonstrate that a common problem discussed in algorithms courses, and a quite 
-	amazing theorem, is really a special case of what we've been discussing. Recall that a 
-	flow network is defined as follows.
-	\begin{definition}{(Flow network)}
-		A \emph{flow network} $G = (V,E)$ is a directed graph in which each edge $(u,v)\in E$ 
-		has nonnegative \emph{capacity} $c_{uv} \geq 0$. Furthermore, there are two 
-		vertices, a source $s$ and a sink $t$. We assume that every $v\in V$ lies in 
-		some path $s\to \cdots \to v\to \cdots \to t$.
-	\end{definition}
-	\begin{definition}{(Flow)}
-		Let $G = (V,E)$ be a flow network. A \emph{flow} in $G$ is a function $f: V\times V \to 
-		\R$ that satisfies the following:
-		\begin{itemize}
-			\item Capacity constraint: For all $u,v\in V$, $0\leq f(u,v) \leq 
-				c_{uv}$.
-			\item Conservation: For all $u\in V\setminus \{s,t\}$, we have 
-				\[
-					\sum _{v\in V} f(v,u) = \sum_{v\in V} f(u,v).
-				\]
-				This says that for all vertices $v$ except our source and sink, the 
-				flow out of $v$ is equal to the flow into $v$. 
-		\end{itemize}
-		We define the value of the flow $val(f) = \sum_{v\in V} f(s,v) - \sum_{v\in V} f(v,s)$, 
-		which is just the flow out of our source minus the flow into our source.
-	\end{definition}
-	The problem as demonstrated in a typical algorithms course is to find a maximum flow from $s$ 
-	to $t$. This is done using a method developed by Ford and Fulkerson which does what $ALG 1$ 
-	does, but in a residual graph (essentially the subgraph where the flows $f(u,v) < c_{uv}$, we 
-	refer the reader to [CITE CLRS] for more detail). \\
-	Now, we recal the definition of a cut in a flow network.
-	\begin{definition}{(Cut)}
-		A \emph{cut} $(S,T)$ of a flow network $G=(V,E)$ is a partition of $V$ into sets $S$ 
-		and $T = V\setminus S$ such that $s\in S$ and $t\in T$. Given a flow $f$, the 
-		\emph{net flow} $f(S,T)$ across the cut $(S,T)$ is defined as 
-		\[
-			f(S,T) = \sum_{u\in S} \sum_{v\in T} f(u,v) - \sum_{u\in S} \sum_{v\in T} 
-			f(v,u).
-		\]
-		Finally, the \emph{capacity} of the cut is $c(S,T) = 
-		\sum_{u\in S} \sum_{v\in T} c(u,v)$. A minimum cut has capacity less than or equal to 
-		all other cuts in the network/
-	\end{definition}
-	One of the coolest and most surpising theorems in an algorithms corse is that, given a flow 
-	network $G$, the value of the maximum flow ($val(f)$) is equal to the capacity of the minimum 
-	$s-t$ cut of $G$.
-\end{section}
-
 \begin{section}{Duality theory}
 \begin{definition}{(Dual)}
 		Let 
@@ -318,7 +231,53 @@ and linear programming.
 	``amount'' that they have to be covered.
 \end{subsection}
 
-\begin{subsection}{Maximum flow duality}
+\begin{subsection}{Revisiting a familiar problem - max-flow/min-cut}
+	Here we demonstrate that a common problem discussed in algorithms courses, and a quite 
+	amazing theorem, is really a special case of what we've been discussing. Recall that a 
+	flow network is defined as follows.
+	\begin{definition}{(Flow network)}
+		A \emph{flow network} $G = (V,E)$ is a directed graph in which each edge $(u,v)\in E$ 
+		has nonnegative \emph{capacity} $c_{uv} \geq 0$. Furthermore, there are two 
+		vertices, a source $s$ and a sink $t$. We assume that every $v\in V$ lies in 
+		some path $s\to \cdots \to v\to \cdots \to t$.
+	\end{definition}
+	\begin{definition}{(Flow)}
+		Let $G = (V,E)$ be a flow network. A \emph{flow} in $G$ is a function $f: V\times V \to 
+		\R$ that satisfies the following:
+		\begin{itemize}
+			\item Capacity constraint: For all $u,v\in V$, $0\leq f(u,v) \leq 
+				c_{uv}$.
+			\item Conservation: For all $u\in V\setminus \{s,t\}$, we have 
+				\[
+					\sum _{v\in V} f(v,u) = \sum_{v\in V} f(u,v).
+				\]
+				This says that for all vertices $v$ except our source and sink, the 
+				flow out of $v$ is equal to the flow into $v$. 
+		\end{itemize}
+		We define the value of the flow $val(f) = \sum_{v\in V} f(s,v) - \sum_{v\in V} f(v,s)$, 
+		which is just the flow out of our source minus the flow into our source.
+	\end{definition}
+	The problem as demonstrated in a typical algorithms course is to find a maximum flow from $s$ 
+	to $t$. This is done using a method developed by Ford and Fulkerson which does what $ALG 1$ 
+	does, but in a residual graph (essentially the subgraph where the flows $f(u,v) < c_{uv}$, we 
+	refer the reader to [CITE CLRS] for more detail). \\
+	Now, we recal the definition of a cut in a flow network.
+	\begin{definition}{(Cut)}
+		A \emph{cut} $(S,T)$ of a flow network $G=(V,E)$ is a partition of $V$ into sets $S$ 
+		and $T = V\setminus S$ such that $s\in S$ and $t\in T$. Given a flow $f$, the 
+		\emph{net flow} $f(S,T)$ across the cut $(S,T)$ is defined as 
+		\[
+			f(S,T) = \sum_{u\in S} \sum_{v\in T} f(u,v) - \sum_{u\in S} \sum_{v\in T} 
+			f(v,u).
+		\]
+		Finally, the \emph{capacity} of the cut is $c(S,T) = 
+		\sum_{u\in S} \sum_{v\in T} c(u,v)$. A minimum cut has capacity less than or equal to 
+		all other cuts in the network/
+	\end{definition}
+	One of the coolest and most surpising theorems in an algorithms corse is that, given a flow 
+	network $G$, the value of the maximum flow ($val(f)$) is equal to the capacity of the minimum 
+	$s-t$ cut of $G$.
+
 	Our goal now is to build up to this same theorem using the tools developed in this chapter. 
 	What follows is due to [CITE VAZIRANI]. We will first give a linear program for the 
 	maximum flow problem. To make things simpler, let's introduce an arc of infinite capacity 
@@ -340,12 +299,12 @@ and linear programming.
 	Our sense (hopefully) is that the dual will somehow relate to minimum cuts, given the 
 	foreshadowing of the previous section. Let's see! We introduce variables $d_{uv}$ and $p_u$ for 
 	each type of inequality in the primal.
-	\begin{alignat}{3}
+	\begin{alignat*}{3}
 		& \text{minimize } & \sum_{(u,v)\in E} c_{uv} d_{uv}& \\
 		& \text{subject to } \quad & d_{uv} - p_u + p_v & \geq 0, & \quad (u,v)\in E &, \\
 				    && p_s - p_t & \geq 1, & \\
 				    && d_{uv} & \geq 0, & \quad (u,v) \in E &.
-	\end{alignat}
+	\end{alignat*}
 	It is known that extreme point solutions to these linear programs takes on values 0 or 1 at 
 	each coordinate. Let consider an optimal dual solution $(\mathbf{d}^{*},\mathbf{p}^{*})$. 
 	First, in order to satisfy $p_s^{*} - p_{t}^{*} \geq 1$ with 0,1 values, it must be the case 
@@ -364,4 +323,3 @@ and linear programming.
 	primal-dual algorithms.
 \end{subsection}
 \end{section}
-\end{document}

@@ -1,0 +1,115 @@
+\documentclass[12pt,twoside]{reedthesis}
+\usepackage{graphicx,latexsym} 
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{longtable,booktabs,setspace} 
+\usepackage[hyphens]{url}
+\usepackage{rotating}
+\usepackage{natbib}
+\usepackage[margin=1in]{geometry}
+\usepackage{clrscode3e}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{float}
+\usetikzlibrary{positioning,arrows}
+\usepackage{setspace}
+\usepackage{mathpazo}
+\doublespacing
+%\usepackage{tikz-berge}
+%\usepackage{algorithm}
+%\usepackage[noend]{algpseudocode}
+
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\renewcommand{\'}{^{'}}
+\renewcommand{\gets}{:=}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{definition}[2][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+
+% Comment out the natbib line above and uncomment the following two lines to use the new 
+% biblatex-chicago style, for Chicago A. Also make some changes at the end where the 
+% bibliography is included. 
+%\usepackage{biblatex-chicago}
+%\bibliography{thesis}
+
+% \usepackage{times} % other fonts are available like times, bookman, charter, palatino
+
+\title{Thesis}
+\author{Zachary Campbell}
+\date{May 2018}
+\division{Mathematics and Natural Sciences}
+\advisor{Jim Fix}
+\department{Mathematics}
+\setlength{\parskip}{0pt}
+
+%% The fun begins:
+\begin{document}
+
+  \maketitle
+  \frontmatter % this stuff will be roman-numbered
+  \pagestyle{empty} % this removes page numbers from the frontmatter
+
+\chapter*{Acknowledgements}
+
+\tableofcontents
+
+\mainmatter % here the regular arabic numbering starts
+\pagestyle{fancyplain} % turns page numbering back on
+%The \introduction command is provided as a convenience.
+%if you want special chapter formatting, you'll probably want to avoid using it altogether
+\chapter*{Introduction}
+         \addcontentsline{toc}{chapter}{Introduction}
+	\chaptermark{Introduction}
+	\markboth{Introduction}{Introduction}
+	% The three lines above are to make sure that the headers are right, that the intro gets included in the table of contents, and that it doesn't get numbered 1 so that chapter one is 1.
+	
+\chapter{Bipartite graphs and matchings}
+
+\input{ch1_thesis.tex}
+
+\chapter{Vertex cover, duality theory, and the max-flow/min-cut relationship}
+
+\input{ch2_thesis.tex}
+
+\chapter{The Hungarian algorithm}
+
+\input{ch3_thesis.tex}
+
+\chapter{General primal-dual method and auction algorithms}
+
+\input{ch4_thesis.tex}
+	
+
+
+
+\backmatter % backmatter makes the index and bibliography appear properly in the t.o.c...
+
+% if you're using bibtex, the next line forces every entry in the bibtex file to be included
+% in your bibliography, regardless of whether or not you've cited it in the thesis.
+    %\nocite{*}
+
+% Rename my bibliography to be called "Works Cited" and not "References" or ``Bibliography''
+% \renewcommand{\bibname}{Works Cited}
+
+%    \bibliographystyle{bsts/mla-good} % there are a variety of styles available; 
+%  \bibliographystyle{plainnat}
+% replace ``plainnat'' with the style of choice. You can refer to files in the bsts or APA 
+% subfolder, e.g. 
+% \bibliographystyle{APA/apa-good}  % or
+% \bibliography{thesis} THIS LINE AND LINE ABOVE FOR REFERENCES
+ % Comment the above two lines and uncomment the next line to use biblatex-chicago.
+ %\printbibliography[heading=bibintoc]
+
+% Finally, an index would go here... but it is also optional.
+\end{document}
