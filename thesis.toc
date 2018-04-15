@@ -16,4 +16,5 @@
 \contentsline {section}{\numberline {4.3}Auction algorithms}{40}
 \contentsline {subsection}{\numberline {4.3.1}Naive algorithm}{42}
 \contentsline {subsection}{\numberline {4.3.2}The auction algorithm}{43}
+\contentsline {section}{\numberline {4.4}Concluding remarks}{45}
 \contentsline {chapter}{References}{47}

@@ -28,6 +28,11 @@ E.L. Lawler.
 \newblock {\em Combinatorial Optimization: Networks and Matroids}.
 \newblock Dover Books on Mathematics Series. Dover Publications, 1976.
 
+\bibitem{papadimitriou2013combinatorial}
+C.H. Papadimitriou and K.~Steiglitz.
+\newblock {\em Combinatorial Optimization: Algorithms and Complexity}.
+\newblock Dover Books on Computer Science. Dover Publications, 2013.
+
 \bibitem{vazirani2002approximation}
 V.V. Vazirani.
 \newblock {\em Approximation Algorithms}.

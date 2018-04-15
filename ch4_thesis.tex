@@ -10,10 +10,7 @@
 	stipulations. Throughout, we will be looking at undirected graphs.
 \begin{section}{The Classical Primal-Dual Method}
 	We begin by looking at what's known as the ``classical'' primal-dual method, which is concerned 
-	with linear programs for polynomial-time solvable optimization problems. This will allow us 
-	to build up a framework for a more general primal-dual method that we can use for approximation 
-	algorithms - i.e. for problems that are known to be $NP$-hard. **(Not sure if this is within the 
-	scope of the thesis -- discuss with Jim)\\
+	with linear programs for polynomial-time solvable optimization problems.\\
 	Let's consider the linear program
 	\begin{alignat}{2}
 		& \text{minimize} & \mathbf{c}^{T}\mathbf{x} \\
@@ -385,7 +382,6 @@
 		\begin{figure}[h]
 		\centering
 			\noindent\fbox{%
-			%\begin{minipage}{\dimexpr\linwidth-2\fboxsep-2\fboxrule\relax}
 			\begin{codebox}
 				\li For each $g\in G$, set $p_g \gets 0$
 				\li Queue $\mathcal{Q} \gets B$.
@@ -446,4 +442,12 @@
 		auctions), and we choose $\epsilon < 1/n$, then our algorithm outputs the optimal 
 		solution. 
 \end{subsection}
+\end{section}
+\begin{section}{Concluding remarks}
+The primal-dual method described in this chapter is just a glimpse into what is a fruitful area of 
+active research. Ultimately, the goal is to use this method to develop approximation algorithms 
+for problems known to be $NP$-hard. Unfortunately, we did not have the time to thoroughly explore 
+this facet in this thesis. However, this thesis provides an introduction to the method so that 
+perhaps in the future some dilligent student may look into this method as it applies to problems in 
+$NP$.
 \end{section}
