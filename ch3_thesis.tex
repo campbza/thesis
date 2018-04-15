@@ -1,9 +1,14 @@
-\begin{section}{The Hungarian algorithm}
+In this chapter we present a comprehensive look at the Hungarian algorithm. The algorithm relies on 
+some interesting techniques, which we spell out carefully. Ultimately, we show how this algorithm 
+solves its associated primal and dual linear programs -- maximum weight matching and minimum weight 
+vertex cover, respectively.
+
+\begin{section}{Preliminaries - alternating trees, labelings, and the Kuhn-Munkres Theorem}
 	In this section we use the motivation of the linear programs to develop an algorithm for 
 	simultaneously solving the maximum weight matching and minimum weight vertex cover problems.
 	Our algorithm works by taking every exposed node on the left, and from each such  node building 
 	a collection of alternating paths. We define this collection formally.
-	\begin{definition}{(Alternating tree)}
+	\begin{definition}
 		Let $G = (U,V,E)$ be a bipartite graph, and $M$ a matching on $G$. An 
 		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
 		conditions:
@@ -74,7 +79,7 @@
 	keeping track of edge weights. For the dual, we will be keeping track of a ``labeling'' on 
 	vertices, given by the $y_u$ and $y_v$ values. We define what a labeling is now.
 
-	\begin{definition}{(Labeling)}
+	\begin{definition}
 		A \emph{vertex labeling} on a weighted bipartite graph $G = (U,V,E)$ is a function 
 		$l: U\cup V \to \N$. We call the labeling \emph{feasible} if for all $u\in U$ and 
 		$v\in V$, $l(u) + l(v) \geq w_{uv}$.
@@ -82,7 +87,7 @@
 	This labeling corresponds to our dual variables; i.e. a feasible labeling is a feasible dual 
 	solution. It will be helpful us to look at a certain subset of our graph where the labeling 
 	is exact ($l(u) + l(v) - w_{uv} = 0$).
-	\begin{definition}{(Equality subgraph)}
+	\begin{definition}
 		The \emph{equality subgraph} of $G = (U,V,E)$ is the graph $G_l = (U,V,E_l)$, 
 		where 
 		\[
@@ -161,7 +166,7 @@
 		weight.
 	\end{proof}
 
-	\begin{lemma}{2}
+	\begin{lemma}
 		Let $S\subseteq U$ and $T = N_l(S) \neq V$. Set 
 		\[
 			\alpha_l = \min _{u\in S,\ v\notin T} \{l(u) + l(v) - w_{uv}\}
@@ -211,6 +216,11 @@
 	\end{proof}
 	We now look at the Hungarian method for finding maximum-weight matchings on bipartite graphs. 
 	This method was originally developed by Kuhn and Munkres, who named it in honor of the Hungarian 
+	mathematicians K\H{o}nig and Egervary.
+\end{section}
+\begin{section}{The Hungarian Algorithm}
+	We now look at the Hungarian method for finding maximum-weight matchings on bipartite graphs. 
+	This method was originally developed by Kuhn and Munkres, who named it in honor of the Hungarian 
 	mathematicians K\H{o}nig and Egervary.\\
 	\\
 	\textbf{The Hungarian Method}
@@ -227,6 +237,7 @@
 					$S := S\cup \{w\}$, $T := T\cup \{v\}$. Go to 3.
 			\end{itemize}
 	\end{enumerate}
+	The correctness of the algorithm follows from the lemma and theorem.
 	We now provide an example of this algorithm.
 	\begin{figure}[h]
 		\centering

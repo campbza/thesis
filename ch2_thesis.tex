@@ -1,5 +1,8 @@
 This chapter aims to describe fundamental relationships between combinatorial optimization problems 
-and linear programming. 
+and linear programming. More specifically, we will define a new problem -- the vertex cover problem -- 
+and show how this problem is intimately related to the matching problem. The way we show this 
+relationship is through duality theory. We also use this to shed light on the max-flow/min-cut 
+theorem.
 
 \begin{section}{The vertex cover problem}
 	We begin this section by defininig a new problem. Again, this is a problem on graphs in 
@@ -7,7 +10,7 @@ and linear programming.
 	for many reasons, but the most pertinent reason is that this problem is NP-complete in the 
 	general case.
 
-	\begin{definition}{(Vertex cover)}
+	\begin{definition}
 		Let $G = (U,V,E)$ be a bipartite graph. A subset $C\subset U\cup V$ is said to be a 
 		\emph{vertex cover} if for each $(u,v)\in E$ we have that at least one of $u,v \in C$.
 		$C$ is a \emph{minimum} vertex cover if for any other cover $C\'$, $|C|\leq |C\'|$.
@@ -67,7 +70,7 @@ and linear programming.
 	You can convince yourself that the cover on the right is a minimum cover. This brings us 
 	to an important theorem. We first prove a lemma.
 
-	\begin{lemma}{1}
+	\begin{lemma}
 		Let $G=(U,V,E)$ be a bipartite graph. Let $M$ be a matching on $G$ and $C$ a cover on 
 		$G$ such that $|M| = |C|$. Then $M$ is a maximum matching and $C$ is a minimum 
 		covering.
@@ -90,20 +93,14 @@ and linear programming.
 	\end{theorem}
 	Before we prove this, we define a simple term: an $M$-alternating path is an alternating path 
 	with respect to a matching $M$.
-
 	\begin{proof}
 		Let $G=(U,V,E)$ be a bipartite graph, and let $M$ be a maximum matching on $G$. 
 		Furthermore, define
-		\[
-			A := \{s\in S\; |\; s \text{ unmatched}\}
-		\]
-		and
-		\[
-			B := \{\text{all vertices connected to nodes in $A$ by $M$-alternating paths}\}
-			.
-		\]
+		\begin{align}
+			A &:= \{s\in S\; |\; s \text{ unmatched}\}\\
+			B &:= \{\text{all vertices connected to nodes in $A$ by $M$-alternating paths}\}.
+		\end{align}
 		Let $L = B\cap U$ and $R = B\cap V$. Then we have the following:
-
 		\begin{enumerate}
 			\item Every node in $R$ is saturated.
 			\item $N(L) = R$,
@@ -129,7 +126,7 @@ and linear programming.
 \end{section}
 
 \begin{section}{Duality theory}
-\begin{definition}{(Dual)}
+	\begin{definition}
 		Let 
 		\begin{alignat*}{2}
 			& \text{maximize } & \mathbf{c}^{T}\mathbf{x} \\
@@ -177,8 +174,6 @@ and linear programming.
 	incident 
 	to $u$ is given by $\sum_{v\in V} x_{uv}$. So we want that this is $\leq 1$. Similarly, for any 
 	node $v$, we want $\sum_{u\in U} x_{uv} \leq 1$. This gives us the following linear program.
-
-	%Maximum matching ILP%
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{u,v} x_{uv}& \\
 		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \forall u\in U&, \\
@@ -195,8 +190,6 @@ and linear programming.
 	objective will be to minimize over the sum of these $y_u,y_v$. Since our constraint 
 	in the primal is the constant vector 1, our only constraint will be that $y_u + y_v \geq 1$. 
 	This gives us the dual linear program
-
-	%Vertex cover ILP%
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u,v} (y_u + y_v)& \\
 		& \text{subject to } \quad & y_u + y_v & \geq 1 & \quad \forall u,v &, \\
@@ -235,13 +228,13 @@ and linear programming.
 	Here we demonstrate that a common problem discussed in algorithms courses, and a quite 
 	amazing theorem, is really a special case of what we've been discussing. Recall that a 
 	flow network is defined as follows.
-	\begin{definition}{(Flow network)}
+	\begin{definition}
 		A \emph{flow network} $G = (V,E)$ is a directed graph in which each edge $(u,v)\in E$ 
 		has nonnegative \emph{capacity} $c_{uv} \geq 0$. Furthermore, there are two 
 		vertices, a source $s$ and a sink $t$. We assume that every $v\in V$ lies in 
 		some path $s\to \cdots \to v\to \cdots \to t$.
 	\end{definition}
-	\begin{definition}{(Flow)}
+	\begin{definition}
 		Let $G = (V,E)$ be a flow network. A \emph{flow} in $G$ is a function $f: V\times V \to 
 		\R$ that satisfies the following:
 		\begin{itemize}
@@ -262,7 +255,7 @@ and linear programming.
 	does, but in a residual graph (essentially the subgraph where the flows $f(u,v) < c_{uv}$, we 
 	refer the reader to [CITE CLRS] for more detail). \\
 	Now, we recal the definition of a cut in a flow network.
-	\begin{definition}{(Cut)}
+	\begin{definition}
 		A \emph{cut} $(S,T)$ of a flow network $G=(V,E)$ is a partition of $V$ into sets $S$ 
 		and $T = V\setminus S$ such that $s\in S$ and $t\in T$. Given a flow $f$, the 
 		\emph{net flow} $f(S,T)$ across the cut $(S,T)$ is defined as 
@@ -286,7 +279,7 @@ and linear programming.
 	which makes the corresponding linear program simpler. The linear program is as follows.
 	\begin{alignat*}{3}
 		& \text{maximize } & f(t,s)\\
-		& \text{subject to } & f(u,v) &\leq c_{uv}, &\quad (u,v)&\in E\\ 
+		& \text{subject to } & f(u,v) &\leq c_{uv}, &\quad (u,v)\in E\\ 
 				     && \sum_{v:(v,u)\in E} f(v,u) & \leq \sum_{v:(u,v)\in E} f(u,v), &
 				     	\quad u\in V &\\
 				     && f(u,v) &\geq 0 &\quad (u,v)\in E &.
@@ -316,7 +309,63 @@ and linear programming.
 	can be 0 without violating the constraints (we want them to be 0 since we are minimizing our 
 	objective function). Thus the objective function's value is equal to the capacity of this 
 	$(S,T)$ cut, which must be a minimum cut. Strong duality tells us that this corresponds to the 
-	value of $f(t,s)$ in the primal linear program.\\
+	value of $f(t,s)$ in the primal linear program. To make this clear, we give an example of a 
+	flow network.\\
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+			\node (n1) at (3,3) {s};
+			\node (n2) at (6,5) {a};
+			\node (n3) at (6,1) {b};
+			\node (n4) at (9,5) {c};
+			\node (n5) at (9,1) {d};
+			\node (n6) at (12,3) {t};
+
+			\draw[->,thick] (n1) -- node[draw=none, above] {3/3} ++ (n2);
+			\draw[->,thick] (n1) -- node[draw=none, below] {2/3} ++ (n3);
+			\draw[->,thick] (n2) -- node[draw=none, right] {0/2} ++ (n3);
+			\draw[->,thick] (n2) -- node[draw=none, above] {3/3} ++ (n4);
+			\draw[->,thick] (n3) -- node[draw=none, below] {2/2} ++ (n5);
+			\draw[->,thick] (n4) -- node[draw=none, right] {1/4} ++ (n5);
+			\draw[->,thick] (n4) -- node[draw=none, above] {2/2} ++ (n6);
+			\draw[->,thick] (n5) -- node[draw=none, below] {3/3} ++ (n6);
+		\end{tikzpicture}
+		\caption{Flow network with maximum flow of 5}
+	\end{figure}
+	In Figure 2.2 we have a flow network that has a maximum flow from $s$ to $t$ of 5. We should 
+	expect that, given our discussion of the dual, we shoul be able to find a cut $(S,T)$ of value 5 
+	such that $S$ consists of nodes with value 1, and $T$ consists of nodes with value 0. We know 
+	that we must set $p_s = 1$ and $p_t = 0$. This gives us the following dual solution, where grey 
+	nodes are in $S$ and white nodes are in $T$.\\
+	\begin{figure}[H]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+			\node [fill=black!20, label=left:{1}] (n1) at (3,3) {s};
+			\node [fill=black!20, label=above:{1}] (n2) at (6,5) {a};
+			\node [fill=black!20, label=below:{1}] (n3) at (6,1) {b};
+			\node [label=above:{0}] (n4) at (9,5) {c};
+			\node [label=below:{0}] (n5) at (9,1) {d};
+			\node [label=right:{0}] (n6) at (12,3) {t};
+
+			\draw[->,thick] (n1) -- node[draw=none, above] {3/3} ++ (n2);
+			\draw[->,thick] (n1) -- node[draw=none, below] {2/3} ++ (n3);
+			\draw[->,thick] (n2) -- node[draw=none, right] {0/2} ++ (n3);
+			\draw[->,line width=0.7mm] (n2) -- node[draw=none, above] {3/3} 
+			node[draw=none, below] {1} ++ (n4);
+			\draw[->,line width=0.7mm] (n3) -- node[draw=none, below] {2/2} 
+			node[draw=none, above] {1} ++ (n5);
+			\draw[->,thick] (n4) -- node[draw=none, right] {1/4} ++ (n5);
+			\draw[->,thick] (n4) -- node[draw=none, above] {2/2} ++ (n6);
+			\draw[->,thick] (n5) -- node[draw=none, below] {3/3} ++ (n6);
+		\end{tikzpicture}
+		\caption{Flow network with corresponding dual solution}
+	\end{figure}
+	In Figure 2.3, the $(S,T)$ cut corresponds to the sets $S= \{s,a,b\}$ and $T = \{c,d,t\}$; the 
+	edges in the cut are the bold edges $a\to c$ and $b\to d$. So the capacity of the cut is 5, 
+	which is what we'd expect. In order to make the figure readable, we leave out our dual labeling 
+	on edges that are not in the cut (their label is 0 anyways). The label on edges in the cut is 
+	1, which we leave in. Note that our dual labeling of edges and vertices in this flow network 
+	satisfies our dual constraints.\\
 	Thus, we have given an alternative formulation of the max-flow/min-cut relationship using 
 	linear programs. In this next chapter we present the main algorithm of this thesis, the 
 	Hungarian algorithm, which is interesting in itself, and also as a tool to motivate general 

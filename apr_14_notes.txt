@@ -1,0 +1,2 @@
+--why is the equivalent dual for the auction algorithm unconstrained
+--bold or not bold vectors

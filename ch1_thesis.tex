@@ -1,20 +1,12 @@
-\begin{section}{Introduction}
-	This thesis is aimed at those who have taken a course in algorithms, especially one in which 
-	network flows, and the max-flow/min-cut theorem were discussed. In this introductory chapter 
-	I will review these topics more briefly, and discuss their relevance to this thesis. 
-	We are not discussing flows or cuts in this thesis (although much of the work done in this 
-	thesis has a alternative frame of reference via flows), but their relevance will be made clear. 
-	The most important thing for the reader to have is a curiosity about the max-flow/min-cut 
-	theorem; there is a lot of cool math behind it, and we demonstrate that math in other settings. 
-	Specifically, we look at this relationship in weighted bipartite matchings.
-\end{section}
-
+	In this chapter we review bipartite graphs and matchings, and discuss their relevance to this 
+	thesis. We will also begin our discussion of linear programming in a casual way to give the 
+	reader a taste for what is coming.
 \begin{section}{Bipartite graphs and matchings}
 
 	Throughout this thesis we will be interested in a specific subclass of graphs known as 
 	bipartite graphs. Unless otherwise noted, our algorithms will assume a bipartite structure.
 
-	\begin{definition}{(Bipartite graph)}
+	\begin{definition}
 		A \emph{bipartite graph} is a graph whose vertices can be partitioned into two 
 		sets $U$ and $V$ such that all edges connect a vertex $u\in U$ to a vertex $v\in V$.
 		We will denote this graph $G = (U,V,E)$, where $E$ is the edge set $(U\times V)$.
@@ -95,7 +87,6 @@
 	\end{tikzpicture}
 	\caption{Examples of bipartite graphs}
 	\end{figure}
-
 	In Figure 1 we have a bipartite graph with vertex partition given by $U = \{A,B,C,D\}$ and 
 	$V = \{E,F,G\}$. All edges in this graph are between a node $u\in U$ and a node $v\in V$. The 
 	graph on the right is also bipartite. It may take a little more time to convince yourself that 
@@ -103,7 +94,7 @@
 	bipartite property. Try it!
 	Now that we know what we are working with, let's introduce a problem that 
 	we'd like to solve on these graphs.  
-	\begin{definition}{(Matching)}
+	\begin{definition}
 		Let $G = (U,V,E)$ be a bipartite graph. A subset $M\subset E$ is a \emph{matching} if 
 		no two edges in $M$ are incident to the same vertex. We call a matching 
 		\emph{perfect} if all vertices are an endpoint of an edge in $M$.
@@ -111,7 +102,6 @@
 	We say that a vertex $w\in U\cup V$ is \emph{matched} with respect to $M$ if it is an endpoint 
 	of some edge in $M$. The following figure shows some examples of different matchings on one 
 	of the graphs from Figure 1, where the bold edges are the edges in the matching.
-
 	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
@@ -159,7 +149,6 @@
 		\end{tikzpicture}
 		\caption{Examples of matchings on a bipartite graph}
 	\end{figure}
-
 	There many different valid matchings on the graph in Figure 2. Oftentimes, we want to find 
 	the largest matching on a graph. This is classically motivated by economic examples, where we 
 	have a set of bidders, and a set of goods, and the edges between them denote a bidder $i$'s 
@@ -167,7 +156,7 @@
 	find the ``largest'' matching on the graph, i.e. the one that maximizes profit of the auction. 
 	We will discuss this interpretation in more depth later on in the thesis, but it naturally 
 	leads to the following definition.
-	\begin{definition}{(Maximal matching)}
+	\begin{definition}
 		A \emph{maximal matching} on $G$ is a matching $M$ such that if any other edge 
 		not in $M$ is added to $M$, it is no longer a valid matching. Alternatively put, 
 		$M$ is maximal if there is no matching $M\'$ such that $M\subset M\'$.
@@ -176,9 +165,8 @@
 	we can add to $M$ and have that $M$ is still a matching. However, notice that these matchings 
 	have different sizes, even though both are maximal on $G$. This leads to the following 
 	definition.
-
-	\begin{definition}{(Maximum matching)}
-		A matching $M$ on a graph $G$ is said to be a \emph{maximum} matching if for all other 
+	\begin{definition}
+		A matching $M$ on a graph $G$ is said to be a \emph{maximum matching} if for all other 
 		matchings $M\'$ on $G$, $|M\'| \leq |M|$.
 	\end{definition}
 	In our example, the matching on the right given by $M = \{(A,E), (B,F), (D,G)\}$ is a 
@@ -189,7 +177,6 @@
 	alternating paths. Before we define what these are, let's look at a motivating example.
 	Suppose we have the matching on the left in Figure 2. So $M = \{(A,E),(D,F)\}$. Consider 
 	the following sequence of vertices in the graph:
-
 	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
@@ -208,7 +195,6 @@
 	operation that we will denote $M\oplus p$, which operates like XOR: add to $M$ each edge in 
 	$p$ that isn't in $M$, and remove from $M$ each edge in $p$ that is in $M$. This gives us 
 	the following segment, where $(B,F)$ and $(D,G)$ are now in $M$, but $(D,F)$ is not:
-
 	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
@@ -231,14 +217,12 @@
 	finding maximum matchings. We want to look for these paths that start and end at unmatched 
 	vertices, and whose edges are alternately matched and unmatched. If we can find one of these 
 	paths, we will be able to increase the size of matching. We define this formally now.
-
-	\begin{definition}{(Alternating path)}
+	\begin{definition}
 		Let $G$ be a graph and $M$ some matching on $G$. An \emph{alternating path} is a 
 		sequence of vertices and edges that begins with an unmatched vertex, and whose 
 		edges alternate between being in $M$ and not in $M$.
 	\end{definition}
-
-	\begin{definition}{(Augmenting path)}
+	\begin{definition}
 		An \emph{augmenting path} is an alternating path that starts and ends on unmatched 
 		vertices. When we augment $M$ by an augmenting path $p$, we use the notation 
 		$M\oplus p$.
@@ -247,7 +231,6 @@
 	just keep looking for augmenting paths, and augment the current matching by that augmenting 
 	path. Of course, we need to prove that this in fact gives us a maximum matching. The following 
 	theorem says exactly that.
-
 	\begin{theorem}{(Berge, 1957)}
 		A matching $M$ on $G$ is a maximum matching if and only if $G$ contains no augmenting 
 		paths with respect to $M$.
@@ -270,7 +253,6 @@
 	serve us throughout the rest of this thesis. At first, the approach will appear purely 
 	pedagogic, but hopefully the reader will understand the significance of it by the end of the 
 	thesis.
-
 \end{section}
 
 \begin{section}{Linear programming}
@@ -285,7 +267,6 @@
 	is constrained by a set of linear inequalities. These problems are ubiquitous in applied math 
 	and computer science, as they model a system in which something needs to be optimized according 
 	to competing resources. We can express a general \emph{maximization} linear program as
-
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{j=1}^{n} c_{j} x_{j}& \\
 		& \text{subject to } \quad & \sum_{j=1}^{n} a_{ij} x_{j} & \leq b_{j}, & i & = 1, \dots 
@@ -294,7 +275,6 @@
 	\end{alignat}
 	We call the function in (1) our \emph{objective function}, and the linear inequalities (2) and 
 	(3) our constraints. Similarly, a \emph{minimization} linear program takes the form
-
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{j=1}^{n} c_{j} x_{j}& \\
 		& \text{subject to } \quad & \sum_{j=1}^{n} a_{ij} x_{j} & \geq b_{j}, & i & = 1, \dots 
@@ -319,7 +299,6 @@
 	[CITE]. These algorithms are beyond the scope of this thesis, but it is important to note that 
 	they exist.
 \end{section}
-
 	Many problems which on the face may not appear to be optimization problems turn out to be 
 	easily rephrased as linear programs. Our goal in the next section will be to describe two 
 	problems in terms of their linear programs. One of these problems we've already looked at, 

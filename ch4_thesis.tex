@@ -46,8 +46,7 @@
 		$\mathbf{s} = \mathbf{b} - A\mathbf{x}$. The dual slackness variables are given by 
 		$\mathbf{t} = A^{T}\mathbf{y} - \mathbf{c}$.
 	\end{definition}
-	\begin{theorem}{}
-		[CITE THIS THEOREM]
+	\begin{theorem}
 		Let $\mathbf{x}$ be a primal feasible solution, and $\mathbf{y}$ a dual feasible 
 		solution. Let $\mathbf{s}$ and $\mathbf{t}$ be the corresponding slackness variables. 
 		Then $\mathbf{x}$ and $\mathbf{y}$ are optimal solutions if and only if the following 
@@ -275,108 +274,176 @@
 	problem is an auction. We will motivate this through an economic lens. Suppose that a good $g$ 
 	has a price $p_g$, and a buyer $b$ must pay $p_g$ to receive this item. Suppose that the 
 	amount $b$ is willing to pay for $g$, or $b$'s valuation of $b$, is $c_{bg}$. Then the net value 
-	of this item to $b$ is $c_{bg} - p_g$. Assuming that each bidder $b$ is a rational agent acting 
-	in their own best interest, each $b$ would want to be assigned a good $g$ that maximizes their 
-	net value, i.e. for all $b$ with good $g$, we have that 
-	\[
-		c_{bg} - p_g = \max_g \{c_{bg} - p_g \}.
-	\]
+	of this item to $b$ is $c_{bg} - p_g$. Let's also adopt the notation that $A(b)$ is the set of 
+	all items bidder $b$ is interestin in (willing to pay for). 
+	Assuming that each bidder $b$ is a rational agent acting 
+	in their own best interest, each $b$ would want to be assigned a good $g_b$ that maximizes their 
+	net value, i.e. for all $b$ with good $g_b$, we have that 
+	\begin{align}
+		c_{bg_b} - p_{g_b} = \max_g \{c_{bg} - p_g \}.
+	\end{align}
 	This would give us an economic system in equilibrium; no bidder would have an incentive to 
-	seek/trade for a different good.
+	seek/trade for a different good.  
 	The reason this is of interest to us is that an equilibrium assignment maximizes total 
 	profit (i.e. it solves the primal linear program for maximum weight matchings), while the 
 	corresponding set of prices solves the associated dual problem.\\
 	Our goal is to maximize the total amount earned in the auction -- i.e. to 
 	maximize $\sum_{(b,g)} c_{bg}$, under the constraint that no bidder gets more than one good, 
 	and no good is purchased by more than one bidder. \\
-	At a general step in our algorithm, we will want to consider a bidder $b$ that is currently 
-	not the owner of any good, and find a good $g$ that maximizes $c_{bg} - p_g$. We will then need 
-	to do to things: (1), replace the current owner of $g$ (put them back into the set of unassigned 
-	bidders) with $b$; (2) bump the price of $g$ by some amount $\delta$. 
-	Step (2) is tricky to figure out. Bertsekas [CITE] describes in detail the process of finding a 
-	good $\delta$ and, more importantly, what values of $\delta$ to avoid. Here we leave out the 
-	details of finding a decent $\delta$. We first present the algorithm with a given $\delta$, and 
-	then analyze why it is a good choice.
-	\singlespace
-	\begin{codebox}
-		\Procname{$\proc{Alg 1}$}
-		\li For each $g\in G$, set $p_g \gets 0$ and $owner_g \gets null$.
-		\li Queue $Q \gets B$.
-		\li Set $\delta = 1/(|G| + 1)$.
-		\li \While $Q\neq \emptyset$
-			\Do
-		\li		$b = Q.deque()$
-		\li		Find $g\in G$ that maximizes $c_{bg} - p_{g}$
-		\li		\If $c_{bg} - p_{g} \geq 0$
-					\Then
-		\li				$Q.enqueue(owner_g)$
-		\li				$owner_g = b$
-		\li				$p_g = p_g + \delta$
+	It will be useful for us to consider an alternate, but equivalent dual problem, which is 
+	suggested by our complementary slackness conditions. In the auction setting, it does not make 
+	sense to have a labeling on the vertices in $B$, the set of buyers, whereas in the usual dual we 
+	have variables on both sets of vertices that partition our graph. The usual dual would look 
+	like
+	\begin{alignat}{3}
+		& \text{minimize } & \sum_{b} p_b + \sum_{g} p_g & \\
+		& \text{subject to } & p_b + p_g & \geq c_{bg} \\
+				     && p_b,p_g & \geq 0 & \quad u,v\in B.
+	\end{alignat}
+	In the auction setting, only 
+	values of $p_g$ make sense; ``prices'' on the bidders is meaningless (unless our auction is two-
+	way, which we are not considering). Note that $\sum_b p_b$ is minimized when we set each $p_b$ 
+	to the smallest value allowed by the constraints (4.52), i.e. $p_b := \min_g \{c_{bg} - p_g\}$. 
+	This gives us the following equivalent dual objective function 
+	\begin{align}
+		&\text{minimize } \sum_b \min_g \{c_{bg} - p_g\} + \sum_g p_g,
+	\end{align}
+	which is unconstrained. Note that this is an exact translation of our complementary slackness 
+	conditions (4.50). Again, this illustrates the importance of complementary slackness in the 
+	creation of algorithms for combinatorial optimization.\\
+	\begin{subsection}{Naive algorithm}
+		We will first proceed in describing a naive auction algorithm, which although clever, 
+		has cases in which it loops infinitely. Nonetheless, we will use it as motivation for 
+		our final auction algorithm.\\
+		Throughout the algorithm, we wil keep track of two sets of bidders -- those that are 
+		currently assigned a good $g$, and those that are not. At a general step in our 
+		algorithm, we will want to consider a bidder $b$ that is currently not the owner of any 
+		good, and find a good $g_b$ such that  $c_{bg_b} - p_g > \max_{g\in A(b)}  \{c_{bg} - 
+		p_g\}$. 
+		We will then need to do to things: (1), replace the current owner $b^{'}$ of $g_b$ 
+		(put them back into the set of unassigned bidders) with $b$; (2) bump the price of $g_b$ 
+		by some amount $\delta_b$. Intuitively, we want to increase $p_{g_b}$ by the largest 
+		amount while still maintaining the fact that $g_b$ offers maximal value to $b$. We can 
+		easily accomplish this by setting $\delta_b = v_b - w_b$, where $v_b = \max_{g\in A(b)} 
+		\{c_{bg} - p_g\} = p_{g_b}$ and $w_b = \max_{g\in A(b),\ g\neq g_b} \{c_{bg} - p_g\}$. 
+		This simply says that we are bumping the price $p_b$ by the difference in the profit of 
+		the best object and the profit of the second best object. \\
+		This is a simple algorithm that has one major problem: there are cases in which it 
+		does not terminate. The issue is that the bidding increment $\delta_b$ is zero when 
+		more than one object offers maximum value to a bidder $b$. Consequently, a situation may 
+		arise in which a number of bidders contend for a smaller number of equally desirable 
+		objects, creating an infinite loop. An example of this is shown in Figure 4.1.
+		\begin{figure}[h]
+			\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+			%left nodes
+			\node (n1) at (1,10) {A};
+			\node (n2) at (1,7) {B};
+			\node (n3) at (1,4) {C};
+
+			%right nodes
+			\node [label=right:{0}] (n4) at (6,10) {D};
+			\node [label=right:{0}] (n5) at (6, 7) {E};
+			\node [label=right:{0}] (n6) at (6, 4) {F};
+		
+			%edges
+			\draw (n1) -- node[near start, draw=none, above] {1} ++ (n4);
+			\draw (n1) -- node[near start, draw=none, above] {1} ++ (n5);
+			\draw (n1) -- node[near start, draw=none, above] {0} ++ (n6);
+			\draw (n2) -- node[near end, draw=none, above] {1} ++ (n4);
+			\draw (n2) -- node[near start, draw=none, above] {1} ++ (n5);
+			\draw (n2) -- node[near start, draw=none, above] {0} ++ (n6);
+			\draw (n3) -- node[near end, draw=none, above] {1} ++ (n4);
+			\draw (n3) -- node[near start, draw=none, below] {1} ++ (n5);
+			\draw (n3) -- node[near start, draw=none, below] {0} ++ (n6);
+		\end{tikzpicture}
+			\caption{Example where the naive algorithm does not terminate.} 
+		\end{figure}
+		In Figure 4.1 the initial prices on all goods is zero. All bidders desire objects 
+		$D$ and $E$ since they offer a benefit of $1-0 = 1$, while object $F$ offers a benefit 
+		of zero to all bidders. Say we first assign bidder $A$ to object $D$. Then the algorithm 
+		will cycle as bidders $B$ and $C$ compete for item $E$ without its price being raised.\\
+		The issue with our naive algorithm can be remedied by adding a small perturbation term 
+		to our complementary slackness, which will break the cycles that cause problems like in 
+		4.1.
+	\end{subsection}
+	\begin{subsection}{The auction algorithm}
+		In real auctions each bid for an object must raise the object's price by some minimum 
+		positive increment $\epsilon$. This will ensure that no matter what, whenever someone 
+		is assigned an item, the price raises by some non-zero amount. We will say that 
+		an assignment and a price vector $p$ satisfy $\epsilon$-\emph{complementary slackness} 
+		if 
+		\begin{align}
+			& c_{b_g} - p_{g_b} \geq \max_{g\in A(b)} \{c_{bg} - p_g\} - \epsilon.
+		\end{align}
+		The new auction algorithm will be the same as the naive one, except in the way we 
+		adjust prices; now $\delta_b = v_b - w_b + \epsilon$. We give the pseudocode below. We 
+		will use a data structure called a queue ($\mathcal{Q}$) to keep track of unassigned 
+		bidders. A queue works exactly how one might think: new elements are placed on the 
+		``bottom'', and members are removed from the ``top''.
+		\singlespace
+		\begin{figure}[h]
+		\centering
+			\noindent\fbox{%
+			%\begin{minipage}{\dimexpr\linwidth-2\fboxsep-2\fboxrule\relax}
+			\begin{codebox}
+				\li For each $g\in G$, set $p_g \gets 0$
+				\li Queue $\mathcal{Q} \gets B$.
+				\li \While $\mathcal{Q}\neq \emptyset$
+					\Do
+				\li		$b = \mathcal{Q}.deque()$
+				\li		Find $g_b\in A(b)$ that maximizes $c_{bg} - p_{g}$
+				\li		Let $b^{'}$ be the bidder currently assigned to $g_b$ 
+				(\emph{null} if none)
+				\li		\If $c_{bg_b} - p_{g_b} \geq 0$
+							\Then
+				\li				$\mathcal{Q}.enqueue(b^{'})$
+				\li				Assign $g_b$ to $b$
+				\li				$p_g = p_g + \delta$
+							\End
 					\End
-			\End
-		\li \Return $(owner_g,g)$ for all $g$.
-	\end{codebox}
-	\doublespacing
-	\begin{definition}{}
-		We say that a bidder $b$ is $\delta$-happy if one of the following is true:
-		\begin{enumerate}
-			\item $b$ is the owner of some good $g$, and for all other goods $g\'$, we have 
-				that $\delta + c_{bg} - p_g \geq c_{bg\'} - p_{g\'}$, i.e. our $b$ 
-				has the good $g$ that maximizes the value of their contribution.
-			\item for no good $g$ does it hold that $owner_g = b$ and for all goods $g$ 
-				$w_{bg} \leq p_g$.
-		\end{enumerate}
-	\end{definition}
-	What we will show is that the algorithm reaches an equilibrium in which all bidders are 
-	``happy,'' as defined above. The loop invariant is that all bidders not in $Q$ are $\delta$-
-	happy. This is clearly true at the beginning, as all bidders start in our queue. When a bidder 
-	$b$ is dequeued, line $6$ in our loop chooses good $g$ that maximizes $w_{bg} - p_g$, which 
-	means it chooses a good that makes $b$ $\delta$-happy, if such a good exists. We need to confirm 
-	that this step does not hurt the invariant for any other bidder $b\'$. Well, an increase in 
-	$p_g$ by $\delta$ for any $g$ not owned by $b\'$ does not violate the inequality $\delta + 
-	w_{b\' g\'} - p_{g\'} \geq w_{b\' g} - p_g$. On the other hand, if $b\'$ did own $g$, this means 
-	that $b\'$ has been thrown back into $Q$, so $b\'$ no longer owns anything.
-	\begin{lemma}{}
-		If all bidders are $\delta$-happy then for every matching $M\'$ we have that 
-		\[
-			n\delta + \sum_{b = owner_g} w_{bg} \geq \sum_{(b,g)\in M\'} w_{bg},
-		\]
-		where $n$ is the number of bidders. 
-	\end{lemma}
-	First, note that this lemma implies the correctness of our algorithm. Since $n\delta < 1$ 
-	and all of our weights are integral, proving this inequality will show that the matching we 
-	output is a maximum matching.
-	\begin{proof}
-		Fix a bidder $b$, and let good $g$ be such that $b = owner_g$. Let $g\'$ be the good 
-		assigned to $b$ in $M\'$. (Note: these could be \emph{null}, in which case we adopt the 
-		convention of assigning their weights and prices to be zero.) Since $b$ is $\delta$-
-		happy, we have that $\delta + w_{bg} - p_g \geq w_{bg} - p_g$. Now let's sum over all 
-		$b$ to get 
-		\[
-			\sum_{b=owner_g} (\delta + w_{bg} - p_g) \geq \sum_{(b,g\')\in M\'} (w_{bg\'} - 
-			p_g).
-		\]
-		We know that our algorithm gives us a matching, as does $M\'$, which means that each 
-		good $g$ can only appear at most once on each side of this inequality. So if we subtract 
-		$\sum_g p_g$ from each side, and rearrange a bit, we get 
-		\[
-			\sum_{b=owner_g} \delta + \sum_{b=owner_g} w_{bg} \geq \sum_{(b,g\')\in M\'} 
-			(w_{bg\'}). 
-		\]
-		But $\sum_{b=owner_g} \delta \leq n\delta$, which gives us what we want.
-	\end{proof}
-	Let's think about how this algorithm relates to the corresponding primal and dual linear 
-	programs. First, note that this algorithm maintains primal feasibility at all times, as each 
-	good has at most one owner, and each bidder owns at most one good. However, at no point are we 
-	maintaining dual feasibility. We can define the ``price'' on bidders $b$ as $p_b = 0$ for all 
-	$b$. Furthermore, the prices on goods $p_g$ never exceed $\max_{b} \{w_{bg}\}$. We can think of 
-	these $p_b$ and $p_g$ as the corresponding dual variables in the dual linear program. 
-	Throughout the course of this algorithm, we never have that $p_b + p_g \geq w_{bg}$, which 
-	means that we are violating our primal complementary slackness conditions. Note however that 
-	we do maintain the dual complementary slackness conditions. 
-	It is still useful to think about this algorithm in terms of the linear programs since, although 
-	infeasible as a dual solution, our final price vector $\mathbf{p}$ is the pointwise minimum 
-	such that all bidders are $\delta$-happy. So the algorithm is still performing a minimization 
-	over $\sum_b p_b + \sum_g p_g = \sum_g p_g$, but relaxing the constraint that $p_b + p_g = 
-	p_g \geq w_{bg}$.\\
+				\li \Return Assignment and price vector
+			\end{codebox}%
+				}
+			\caption{Auction algorithm}
+		\end{figure}
+		\doublespacing
+		Now, because we are relaxing our complementary slackness constraint, we should not 
+		expect to get optimal solutions. In fact, optimality of our solution relies entirely on 
+		how we choose our $\epsilon$. It turns out that whatever $\epsilon$ is, the solution 
+		by a feasible assignment and price vector that satisfy $\epsilon$-complementary 
+		slackness will be within $n\epsilon$ of optimal. We state this formally.
+
+		\begin{theorem}
+			A feasible assignment that satisfies $\epsilon$-complementary slackness along 
+			a price vector $\mathbf{p}$ is within $n\epsilon$ of being optimal. 
+			Furthermore, the price vector is within $n\epsilon$ of being an optimal dual 
+			solution.
+		\end{theorem}
+		\begin{proof}
+			Let $\Gamma$ be an optimal assignment, and $\Omega$ the corresponding dual cost. 
+			So 
+			\begin{align}
+				\Gamma &= \max_{g_b} \sum_b c_{bg_b} \quad \text{where $g_b\neq 
+				g_{b^{'}}$ if $b\neq b^{'}$}\\
+				\Omega &= \min_{p_g} \{\sum_b \max_{g\in A(b)} \{c_{bg} - p_g\} + 
+				\sum_g p_g
+			\end{align}
+			Firstly, weak duality tells us that $\Gamma \leq \Omega$. Since our assignment 
+			and prices satisfy $\epsilon$-complementary slackness, we know that 
+			\[
+				\max_{g\in A(b)} \{c_{bg} - p_g\} - \epsilon \leq c_{bg_b} - p_{g_b}.
+			\]
+			This means that we have 
+			\[
+				\Omega \leq \sum_b \left(\max_{g\in A(b)} \{c_{bg} - p_g\} + p_{g_b} 
+				\right) \leq \sum_b c_{bg_b} + n\epsilon \leq \Gamma + n\epsilon.
+			\]
+			This shows that both our primal and dual objective functions are within 
+			$n\epsilon$ of optimality.
+		\end{proof}
+		Note that in the case where all $c_{bg}$ are integers (which is usually the case in 
+		auctions), and we choose $\epsilon < 1/n$, then our algorithm outputs the optimal 
+		solution. 
+\end{subsection}
 \end{section}
