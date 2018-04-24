@@ -1,2 +1,4 @@
 --why is the equivalent dual for the auction algorithm unconstrained
 --bold or not bold vectors
+--make sure to change all references to figures
+--get rid of words like ''things'' and other non-academic terms

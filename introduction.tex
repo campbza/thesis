@@ -1,25 +1,32 @@
 This thesis explores the curious mathematics behind a theorem covered in a typical course in 
-algorithms and data structures, namely the Max-flow/Min-cut theorem. The aim of the thesis is to 
-demonstrate the intimate relationship between problems in combinatorial optimization, and a field 
-called linear programming. \\
-In order to do this, we develop useful tools along the way. We first 
-review concepts in elementary graph theory (bipartite graphs and matchings), and introduce the topic 
-of linear programming. We then look at a problem called the vertex problem, which we will discover 
-is fundamentally related to the matching problem on bipartite graphs. We discover this relationship 
-using duality theory, an important aspect of linear programming. As a consequence of our duality 
-theorems we are show that the max-flow/min-cut relationship in flow networks is just a special case of 
+algorithms and data structures, namely the max-flow min-cut theorem. The aim of the thesis is to 
+demonstrate the intimate relationship between such problems in combinatorial optimization and linear 
+programming.
+
+In order to do this, we first 
+review concepts in elementary graph theory (bipartite graphs and matchings) and introduce the topic 
+of linear programming. We then look at a problem called the vertex cover problem, which we will discover 
+is fundamentally related to the matching problem on bipartite graphs. It turns out that given a solution 
+to one of these problems, we can construct a solution to the other. We discover this relationship 
+using duality theory, an important concept in linear programming. 
+
+As a consequence of the duality 
+theorems, we show that the max-flow min-cut relationship in flow networks is simply a special case of 
 linear programming duality. After this, we turn our attention to the main algorithm in this thesis:
-the Hungarian algorithm. This algorithm for solving weighted bipartite matchings was developed in the 
-50s by Harold Kuhn. This algorithm is significant in that it used duality theory as its fundamental 
-design principle; in many ways it predicted the use of linear programs to solve combinatorial 
-optimization problems. Finally, we take a step back in our final chapter and look at the general 
+the Hungarian algorithm. Its invention was a significant development in combinatorial optimization 
+in that its generalization led to several other techniques based on linear programming and linear 
+programming duality. 
+
+Finally, we take a step back in our final chapter and look at the general 
 ``primal-dual method'' inspired by the Hungarian algorithm. This method uses general linear programming 
-principles to design algorithms for network design problems. The main result here is that, quite 
-magically, we are able to turn \emph{weighted} problems into equivalent unweighted versions, which 
-are often easier to solve. We finish by describing a class of auction algorithms which use this 
-primal-dual methodology.\\
+principles to design algorithms for network design problems (essentially problems on weighted graphs in 
+which one desires to choose some optimal subset of the graph). The main result here is that, quite 
+magically, we are able to turn these \emph{weighted} problems into equivalent unweighted problems, which 
+are often much easier to solve. We finish by describing a class of auction algorithms which use this 
+primal-dual methodology.
+
 This thesis began as an endeavour to understand the Hungarian algorithm. From this, we learned 
-quite a lot about it's influence on the world of combinatorial optimization and linear programming. 
+quite a lot about its influence on the world of combinatorial optimization and linear programming. 
 Although we restrict our attention to polynomial-time solvable problems in this thesis, the tools 
 developed generally extend to, and are geared towards, approximation algorithms for $NP$-hard 
 problems. 

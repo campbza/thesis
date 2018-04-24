@@ -4,7 +4,7 @@
 	graphs. In network design problems we are given a graph $G = (U,V,E)$ 
 	and a cost $c_{uv}$ for each edge $(u,v)\in E$, and the goal is to find a minimum/maximum-cost 
 	subset 
-	$E\' \subset E$ that satisfies some criteria. Our maximum-cost matching problem is an example
+	$E\' \subset E$ that satisfies some criteria. Our maximum-weight matching problem is an example
 	of this. There are other common examples that we will explore later on, but for now it suffices 
 	to just think of these problems as choosing subsets of our graph according to some 
 	stipulations. Throughout, we will be looking at undirected graphs.
@@ -49,8 +49,8 @@
 		Then $\mathbf{x}$ and $\mathbf{y}$ are optimal solutions if and only if the following 
 		two conditions hold:
 		\begin{align}
-			x_jt_j &= 0 \quad \forall j \\
-			y_is_i &= 0 \quad \forall i.
+			x_jt_j &= 0 \quad \text{for all } j \\
+			y_is_i &= 0 \quad \text{for all } i
 		\end{align}
 	\end{theorem}
 	\begin{proof}
@@ -70,9 +70,10 @@
 	profit given some constraints on resources, i.e. a resource allocation problem. The dual can 
 	be interpreted as a valuation of the resources -- it tells us the availability of a resource, 
 	and its price. So if we have optimal $\mathbf{x}$ and $\mathbf{y}$, we can interpret 
-	slackness as follows: if there is slack in a constrained primal resource $i$ ($s_u > 0$), 
-	then additional units of that resource must have no value ($y_u = 0$); if there is slack 
-	in the dual price constraint ($t_v > 0$) there must be a shortage of that resource ($x_v = 0$).\\
+	slackness as follows: if there is slack in a constrained primal resource $i$ ($s_i > 0$), 
+	then additional units of that resource must have no value ($y_i = 0$); if there is slack 
+	in the dual price constraint ($t_j > 0$) there must be a shortage of that resource ($x_j = 0$).
+
 	We now give an example of complementary slackness in action. Let's look back to our maximum 
 	weight matching problem.Recall the primal linear program for maximum-weight matching:
 	%Maximum matching ILP%
@@ -108,7 +109,8 @@
 	then at each step works to decrease the number of conditions in (9) that are unsatisfied, while 
 	maintaining satisfiability of (8) and (10). This method is not unique to the Hungarian 
 	algorithm. In fact, the Hungarian algorithm paved the way for this general method, which we 
-	describe presently.\\
+	describe presently.
+
 	Looking back at the original linear programs at the beginning of this chapter, suppose we have 
 	a dual feasible solution $\mathbf{y}$. We can then state the problem of finding a feasible 
 	primal solution $\mathbf{x}$ that obeys our complementary slackness conditions as another 
@@ -170,7 +172,8 @@
 	\]
 	If we choose the lower of these two $\epsilon$ values, we obtain a new feasible dual solution 
 	that has greater objective value. We can then work by reiterating the procedure, with the hope 
-	that we find an optimal primal solution.\\
+	that we find an optimal primal solution.
+
 	It's not immediately clear why reducing our original linear programs to a series of linear 
 	programs is heplful. However,  note that the vector $\mathbf{c}$ has totally disappeared in 
 	the restricted primal and its dual. Recall that in the original linear program, $\mathbf{c}$ 
@@ -184,7 +187,7 @@
 	oftentimes more efficient.
 \end{section}
 	
-\begin{section}{Primal-dual method for weighted matchings}
+\begin{section}{The Primal-Dual Method for Weighted Matchings}
 	Let us now look at an example of this method. We will look at a weighted matching problem, as 
 	in the previous chapter, but this time we will look at \emph{minimizing} the cost of the 
 	matching, instead of maximizing. We do this mainly because it illustrates something important 
@@ -193,16 +196,16 @@
 	linear program for a minimum weight perfect matching on a bipartite graph is given as follows. 
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u,v} c_{uv} x_{uv}& \\
-		& \text{subject to } \quad & \sum_{v} x_{uv} & \geq 1, & \quad \forall u\in U&, \\
-				     &\quad & \sum_{u} x_{uv} & \geq 1, & \quad \forall v\in V &, \\
-				&& x_{uv} & \geq 0.
+		& \text{subject to } \quad & \sum_{v} x_{uv} & \geq 1 & \quad \text{for all } u\in U& \\
+				     &\quad & \sum_{u} x_{uv} & \geq 1 & \quad \text{for all } v\in V & \\
+				&& x_{uv} & \geq 0
 	\end{alignat}
 	Its dual is
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{u}y_u + \sum_{v}y_v & \\
-		& \text{subject to } \quad & y_u + y_v & \leq c_{uv} & \quad \forall 
-					u\in U,\ v\in V &, \\
-				    && y_u,y_v & \geq 0.
+		& \text{subject to } \quad & y_u + y_v & \leq c_{uv} & \quad \text{for all }
+					u\in U,\ v\in V & \\
+				    && y_u,y_v & \geq 0
 	\end{alignat}
 	We need to start with a dual feasible solution, and try to find a primal solution that 
 	minimizes the violation of the constraints and slackness conditions. We can start with the 
@@ -219,11 +222,11 @@
 	consists of all vertices. So our restricted primal linear program is
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u\in U} s_u + \sum_{v\in v} s_v & \\
-		& \text{subject to } & \sum_v x_{uv} - s_u & = 1 & \quad \forall u &, \\
-				     && \sum_u x_{uv} - s_v & = 1 & \quad \forall v &, \\
-				     && x_{uv} & = 0 & \quad (u,v)\notin A, \\
-				     && x_{uv} & \geq 0 & \quad (u,v)\in A, \\
-				     && \mathbf{s} & \geq 0.
+		& \text{subject to } & \sum_v x_{uv} - s_u & = 1 & \quad \text{for all } u & \\
+				     && \sum_u x_{uv} - s_v & = 1 & \quad \text{for all } v & \\
+				     && x_{uv} & = 0 & \quad (u,v)\notin A \\
+				     && x_{uv} & \geq 0 & \quad (u,v)\in A \\
+				     && \mathbf{s} & \geq 0
 	\end{alignat}
 	Let's first observe that all components of this restricted primal take on values 0 or 1, as 
 	in the original primal. Moreover, note that we have turned a weighted problem into an 
@@ -243,11 +246,11 @@
 	restricted primal.
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{u\in U} w_u + \sum_{v\in V} w_v & \\
-		& \text{subject to } & w_u + w_v & \leq 0 & \quad \forall (u,v)\in A &, \\
-				     && w_u + w_v & \leq 1 & \quad \forall (u,v)\notin A &, \\
-				     && w_u,w_v & \geq -1 & \quad u,v\notin B, \\
-				     && w_u,w_v & \geq 0 & \quad u,v\in B, \\
-				     && \mathbf{w} & \geq 0.
+		& \text{subject to } & w_u + w_v & \leq 0 & \quad \text{for all } (u,v)\in A & \\
+				     && w_u + w_v & \leq 1 & \quad \text{for all } (u,v)\notin A & \\
+				     && w_u,w_v & \geq -1 & \text{for all } u,v\notin B \\
+				     && w_u,w_v & \geq 0 & \text{for all } u,v\in B \\
+				     && \mathbf{w} & \geq 0
 	\end{alignat}
 	We now want to find an $\epsilon$ such that the solution $z = \sum_u y_u + \sum_v y_v + 
 	\epsilon (\sum_u w_u + \sum_v w_v)$ is (1) feasible and (2) an improvement of the dual 
@@ -266,7 +269,7 @@
 	primal solution.
 \end{section}
 
-\begin{section}{Auction algorithms}
+\begin{section}{Auction Algorithms}
 	We now look at a cool application of weighted bipartite matching. Let's imagine our assignment 
 	problem is an auction. We will motivate this through an economic lens. Suppose that a good $g$ 
 	has a price $p_g$, and a buyer $b$ must pay $p_g$ to receive this item. Suppose that the 
@@ -283,10 +286,11 @@
 	seek/trade for a different good.  
 	The reason this is of interest to us is that an equilibrium assignment maximizes total 
 	profit (i.e. it solves the primal linear program for maximum weight matchings), while the 
-	corresponding set of prices solves the associated dual problem.\\
+	corresponding set of prices solves the associated dual problem.
+
 	Our goal is to maximize the total amount earned in the auction -- i.e. to 
 	maximize $\sum_{(b,g)} c_{bg}$, under the constraint that no bidder gets more than one good, 
-	and no good is purchased by more than one bidder. \\
+	and no good is purchased by more than one bidder.
 	It will be useful for us to consider an alternate, but equivalent dual problem, which is 
 	suggested by our complementary slackness conditions. In the auction setting, it does not make 
 	sense to have a labeling on the vertices in $B$, the set of buyers, whereas in the usual dual we 
@@ -295,23 +299,24 @@
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{b} p_b + \sum_{g} p_g & \\
 		& \text{subject to } & p_b + p_g & \geq c_{bg} \\
-				     && p_b,p_g & \geq 0 & \quad u,v\in B.
+				     && p_b,p_g & \geq 0 & \quad u,v\in B
 	\end{alignat}
 	In the auction setting, only 
 	values of $p_g$ make sense; ``prices'' on the bidders is meaningless (unless our auction is two-
 	way, which we are not considering). Note that $\sum_b p_b$ is minimized when we set each $p_b$ 
-	to the smallest value allowed by the constraints (4.52), i.e. $p_b := \min_g \{c_{bg} - p_g\}$. 
+	to the largest value allowed by the constraints (4.52), i.e. $p_b := \max_g \{c_{bg} - p_g\}$. 
 	This gives us the following equivalent dual objective function 
 	\begin{align}
-		&\text{minimize } \sum_b \min_g \{c_{bg} - p_g\} + \sum_g p_g,
+		&\text{minimize }\{ \sum_b \max_g \{c_{bg} - p_g\} + \sum_g p_g\},
 	\end{align}
 	which is unconstrained. Note that this is an exact translation of our complementary slackness 
 	conditions (4.50). Again, this illustrates the importance of complementary slackness in the 
 	creation of algorithms for combinatorial optimization.\\
-	\begin{subsection}{Naive algorithm}
+	\begin{subsection}{The Naive Algorithm}
 		We will first proceed in describing a naive auction algorithm, which although clever, 
 		has cases in which it loops infinitely. Nonetheless, we will use it as motivation for 
-		our final auction algorithm.\\
+		our final auction algorithm.
+
 		Throughout the algorithm, we wil keep track of two sets of bidders -- those that are 
 		currently assigned a good $g$, and those that are not. At a general step in our 
 		algorithm, we will want to consider a bidder $b$ that is currently not the owner of any 
@@ -324,7 +329,8 @@
 		easily accomplish this by setting $\delta_b = v_b - w_b$, where $v_b = \max_{g\in A(b)} 
 		\{c_{bg} - p_g\} = p_{g_b}$ and $w_b = \max_{g\in A(b),\ g\neq g_b} \{c_{bg} - p_g\}$. 
 		This simply says that we are bumping the price $p_b$ by the difference in the profit of 
-		the best object and the profit of the second best object. \\
+		the best object and the profit of the second best object.
+
 		This is a simple algorithm that has one major problem: there are cases in which it 
 		does not terminate. The issue is that the bidding increment $\delta_b$ is zero when 
 		more than one object offers maximum value to a bidder $b$. Consequently, a situation may 
@@ -356,25 +362,30 @@
 		\end{tikzpicture}
 			\caption{Example where the naive algorithm does not terminate.} 
 		\end{figure}
-		In Figure 4.1 the initial prices on all goods is zero. All bidders desire objects 
-		$D$ and $E$ since they offer a benefit of $1-0 = 1$, while object $F$ offers a benefit 
-		of zero to all bidders. Say we first assign bidder $A$ to object $D$. Then the algorithm 
-		will cycle as bidders $B$ and $C$ compete for item $E$ without its price being raised.\\
+		In this figure the initial prices on all goods is zero. All bidders desire objects 
+		$\mbox{D}$ and $\mbox{E}$ since they offer a benefit of $1-0 = 1$, while object 
+		$\mbox{F}$ offers a benefit 
+		of zero to all bidders. Say we first assign bidder $\mbox{A}$ to object $\mbox{D}$. 
+		Then the algorithm 
+		will cycle as bidders $\mbox{B}$ and $\mbox{C}$ compete for item $\mbox{E}$ without 
+		its price being raised.
+
 		The issue with our naive algorithm can be remedied by adding a small perturbation term 
 		to our complementary slackness, which will break the cycles that cause problems like in 
-		4.1.
+		Figure 4.1.
 	\end{subsection}
-	\begin{subsection}{The auction algorithm}
-		In real auctions each bid for an object must raise the object's price by some minimum 
-		positive increment $\epsilon$. This will ensure that no matter what, whenever someone 
+	\begin{subsection}{The Auction Algorithm}
+		In real auctions it is often the case that each bid for an object must raise the 
+		object's price by some minimum positive increment $\epsilon$. 
+		This will ensure that no matter what, whenever someone 
 		is assigned an item, the price raises by some non-zero amount. We will say that 
-		an assignment and a price vector $p$ satisfy $\epsilon$-\emph{complementary slackness} 
-		if 
+		an assignment and a price vector $\mathbf{p}$ satisfy $\epsilon$-\emph{complementary 
+		slackness} if 
 		\begin{align}
 			& c_{b_g} - p_{g_b} \geq \max_{g\in A(b)} \{c_{bg} - p_g\} - \epsilon.
 		\end{align}
 		The new auction algorithm will be the same as the naive one, except in the way we 
-		adjust prices; now $\delta_b = v_b - w_b + \epsilon$. We give the pseudocode below. We 
+		adjust prices; now $\delta_b := v_b - w_b + \epsilon$. We give the pseudocode below. We 
 		will use a data structure called a queue ($\mathcal{Q}$) to keep track of unassigned 
 		bidders. A queue works exactly how one might think: new elements are placed on the 
 		``bottom'', and members are removed from the ``top''.
@@ -395,7 +406,7 @@
 							\Then
 				\li				$\mathcal{Q}.enqueue(b^{'})$
 				\li				Assign $g_b$ to $b$
-				\li				$p_g = p_g + \delta$
+				\li				$p_g = p_g + \delta_b$
 							\End
 					\End
 				\li \Return Assignment and price vector
@@ -406,13 +417,13 @@
 		\doublespacing
 		Now, because we are relaxing our complementary slackness constraint, we should not 
 		expect to get optimal solutions. In fact, optimality of our solution relies entirely on 
-		how we choose our $\epsilon$. It turns out that whatever $\epsilon$ is, the solution 
-		by a feasible assignment and price vector that satisfy $\epsilon$-complementary 
-		slackness will be within $n\epsilon$ of optimal. We state this formally.
-
+		how we choose our $\epsilon$. It turns out that whatever $\epsilon$ is, 
+		an assignment of bidders and a price vector that together satisfy $\epsilon$-
+		complementary slackness will be within $n\epsilon$ of optimal. We state this formally.
 		\begin{theorem}
-			A feasible assignment that satisfies $\epsilon$-complementary slackness along 
-			a price vector $\mathbf{p}$ is within $n\epsilon$ of being optimal. 
+			A feasible assignment of bidders along with a price vector $\mathbf{p}$, 
+			which together satisfy $\epsilon$-complementary slackness, 
+			is within $n\epsilon$ of being optimal. 
 			Furthermore, the price vector is within $n\epsilon$ of being an optimal dual 
 			solution.
 		\end{theorem}
@@ -423,7 +434,7 @@
 				\Gamma &= \max_{g_b} \sum_b c_{bg_b} \quad \text{where $g_b\neq 
 				g_{b^{'}}$ if $b\neq b^{'}$}\\
 				\Omega &= \min_{p_g} \{\sum_b \max_{g\in A(b)} \{c_{bg} - p_g\} + 
-				\sum_g p_g
+				\sum_g p_g\}
 			\end{align}
 			Firstly, weak duality tells us that $\Gamma \leq \Omega$. Since our assignment 
 			and prices satisfy $\epsilon$-complementary slackness, we know that 
@@ -439,11 +450,11 @@
 			$n\epsilon$ of optimality.
 		\end{proof}
 		Note that in the case where all $c_{bg}$ are integers (which is usually the case in 
-		auctions), and we choose $\epsilon < 1/n$, then our algorithm outputs the optimal 
-		solution. 
+		auctions), choosing an $\epsilon < 1/n$, gives an optimal output for both the primal 
+		and dual solutions.
 \end{subsection}
 \end{section}
-\begin{section}{Concluding remarks}
+\begin{section}{Concluding Remarks}
 The primal-dual method described in this chapter is just a glimpse into what is a fruitful area of 
 active research. Ultimately, the goal is to use this method to develop approximation algorithms 
 for problems known to be $NP$-hard. Unfortunately, we did not have the time to thoroughly explore 

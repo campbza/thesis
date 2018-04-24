@@ -13,6 +13,11 @@ D.~Bertsimas and J.N. Tsitsiklis.
 \newblock Athena Scientific series in optimization and neural computation.
   Athena Scientific, 1997.
 
+\bibitem{birkhoff1946}
+Garrett Birkhoff.
+\newblock Tres observaciones sobre el algebra lineal.
+\newblock {\em Univ. Nac. Tucuman Rev. Ser. A}, 5:147--151, 1946.
+
 \bibitem{cormen2009introduction}
 T.H. Cormen, C.E. Leiserson, R.L. Rivest, and C.~Stein.
 \newblock {\em Introduction to Algorithms}.
@@ -37,5 +42,10 @@ C.H. Papadimitriou and K.~Steiglitz.
 V.V. Vazirani.
 \newblock {\em Approximation Algorithms}.
 \newblock Springer Berlin Heidelberg, 2002.
+
+\bibitem{vN53}
+J.~Von~Neuman and Shapley.
+\newblock {\em Contributions to the Theory of Games (AM-28), Volume II}.
+\newblock Princeton University Press, 1953.
 
 \end{thebibliography}

@@ -1,20 +1,20 @@
 \contentsline {chapter}{Introduction}{1}
-\contentsline {chapter}{Chapter 1: Bipartite graphs, matchings, and linear programming}{3}
-\contentsline {section}{\numberline {1.1}Bipartite graphs and matchings}{3}
-\contentsline {section}{\numberline {1.2}Linear programming}{7}
-\contentsline {chapter}{Chapter 2: Vertex cover, duality theory, and the max-flow/min-cut relationship}{11}
-\contentsline {section}{\numberline {2.1}The vertex cover problem}{11}
-\contentsline {section}{\numberline {2.2}Duality theory}{14}
-\contentsline {subsection}{\numberline {2.2.1}Maximum-matching duality}{15}
-\contentsline {subsection}{\numberline {2.2.2}Revisiting a familiar problem - max-flow/min-cut}{17}
-\contentsline {chapter}{Chapter 3: The Hungarian algorithm}{23}
-\contentsline {section}{\numberline {3.1}Preliminaries - alternating trees, labelings, and the Kuhn-Munkres Theorem}{23}
-\contentsline {section}{\numberline {3.2}The Hungarian Algorithm}{27}
-\contentsline {chapter}{Chapter 4: General primal-dual method and auction algorithms}{31}
-\contentsline {section}{\numberline {4.1}The Classical Primal-Dual Method}{31}
-\contentsline {section}{\numberline {4.2}Primal-dual method for weighted matchings}{37}
-\contentsline {section}{\numberline {4.3}Auction algorithms}{40}
-\contentsline {subsection}{\numberline {4.3.1}Naive algorithm}{42}
-\contentsline {subsection}{\numberline {4.3.2}The auction algorithm}{43}
-\contentsline {section}{\numberline {4.4}Concluding remarks}{45}
-\contentsline {chapter}{References}{47}
+\contentsline {chapter}{Chapter 1: Matchings and Linear Programming}{3}
+\contentsline {section}{\numberline {1.1}Bipartite Graphs and Matchings}{3}
+\contentsline {section}{\numberline {1.2}Linear Programming}{7}
+\contentsline {chapter}{Chapter 2: Vertex Cover and Duality Theory}{11}
+\contentsline {section}{\numberline {2.1}The Vertex Cover Problem}{11}
+\contentsline {section}{\numberline {2.2}Duality Theory}{14}
+\contentsline {subsection}{\numberline {2.2.1}Maximum-Matching Duality}{16}
+\contentsline {subsection}{\numberline {2.2.2}The Max-Flow Min-Cut Theorem}{18}
+\contentsline {chapter}{Chapter 3: The Hungarian Algorithm}{25}
+\contentsline {section}{\numberline {3.1}Preliminaries}{25}
+\contentsline {section}{\numberline {3.2}The Hungarian Algorithm}{29}
+\contentsline {chapter}{Chapter 4: The Primal-Dual Method and Auction Algorithms}{33}
+\contentsline {section}{\numberline {4.1}The Classical Primal-Dual Method}{33}
+\contentsline {section}{\numberline {4.2}The Primal-Dual Method for Weighted Matchings}{39}
+\contentsline {section}{\numberline {4.3}Auction Algorithms}{42}
+\contentsline {subsection}{\numberline {4.3.1}The Naive Algorithm}{44}
+\contentsline {subsection}{\numberline {4.3.2}The Auction Algorithm}{45}
+\contentsline {section}{\numberline {4.4}Concluding Remarks}{47}
+\contentsline {chapter}{References}{49}

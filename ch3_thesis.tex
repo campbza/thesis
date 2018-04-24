@@ -1,13 +1,13 @@
-In this chapter we present a comprehensive look at the Hungarian algorithm. The algorithm relies on 
+In this chapter, we present a comprehensive look at the Hungarian algorithm. The algorithm relies on 
 some interesting techniques, which we spell out carefully. Ultimately, we show how this algorithm 
-solves its associated primal and dual linear programs -- maximum weight matching and minimum weight 
-vertex cover, respectively.
+solves its associated primal and dual linear programs -- the maximum weight matching and 
+the minimum weight vertex cover problems, respectively.
 
-\begin{section}{Preliminaries - alternating trees, labelings, and the Kuhn-Munkres Theorem}
-	In this section we use the motivation of the linear programs to develop an algorithm for 
+\begin{section}{Preliminaries}
+	In this section, we use the motivation of the linear programs to develop an algorithm for 
 	simultaneously solving the maximum weight matching and minimum weight vertex cover problems.
-	Our algorithm works by taking every exposed node on the left, and from each such  node building 
-	a collection of alternating paths. We define this collection formally.
+	Our algorithm works by taking every exposed vertex on the left, and from each such 
+	vertex building a collection of alternating paths. We define this collection formally.
 	\begin{definition}
 		Let $G = (U,V,E)$ be a bipartite graph, and $M$ a matching on $G$. An 
 		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
@@ -165,55 +165,77 @@ vertex cover, respectively.
 		So $\sum_{(u,v)\in M\'} w_{uv} \leq \sum_{(u,v)\in M}$, meaning $M$ must be maximum 
 		weight.
 	\end{proof}
+	
+	This theorem tells us that if we can give an algorithm for finding a perfect matching in the 
+	equality subgraph, we can find a maximum weight matching. To do this, we will first define a 
+	few terms. 
+	\begin{definition}
+		Given a feasible labeling $l$ on a graph $G = (U,V,E)$, we define the \emph{neighbors} 
+		of a vertex relative to our labeling $l$ to be 
+		$u\in U$ to be $N_l (u) = \{v\ |\ (u,v)\in E_l\}$. For a subset $S$ of 
+		vertices, $N_l (S) = \cup_{u\in S} N_l (u)$.
+	\end{definition}
 
-	\begin{lemma}
-		Let $S\subseteq U$ and $T = N_l(S) \neq V$. Set 
-		\[
-			\alpha_l = \min _{u\in S,\ v\notin T} \{l(u) + l(v) - w_{uv}\}
-		\]
-		and 
+	We will use these sets to construct our alternating forests. Now, consider a feasible labeling 
+	$l$ on a graph $G = (U,V,E)$. Let $S\subseteq X$ and $T := N_l (S) \neq V$, and set 
+	\[
+		\delta = \min_{u\in S,\ v\notin T} \{l(u) + l(v) - w_{uv} \}.
+	\]
+	Define a new labeling $l^{'}$ as follows:
 		\[
 			l\' (w) = 
 			\begin{cases}
-				l(w) - \alpha_l &\text{ if } w\in S \\
-				l(w) + \alpha_l &\text{ if } w\in T \\
+				l(w) - \delta &\text{ if } w\in S \\
+				l(w) + \delta &\text{ if } w\in T \\
 				l(w) &\text{ otherwise.}
 			\end{cases}
 		\]
-		Then $l\'$ is a feasible labeling, and 
-		\begin{enumerate}
-			\item If $(u,v)\in E_l$ for $u\in S$ and $v\in T$ then $(u,v)\in E_{l\'}$.
-			\item If $(u,v)\in E_l$ for $u\notin S$, and $v\notin T$, then $(u,v)\in 
-				E_{l\'}$.
-			\item There is some edge $(u,v)\in E_{l\'}$ for $u\in S$, $v\notin T$.
-		\end{enumerate}
+	We will show that this new labeling is feasible.
+	\begin{lemma}
+		The labeling $l^{'}$ as defined above is a feasible labeling.
 	\end{lemma}
 
 	\begin{proof}
-		First, we show that $l\'$ is feasible. For $u\in U$, $v\in V$, there are four 
-		possibilities:
+		To show this labeling is feasible, we must show that for any edge $(u,v)$, 
+		$l^{'}(u) + l^{'}(v) \geq w_{uv}$. For $u\in U$, $v\in V$, there are four possibilities:
 		\begin{itemize}
-			\item if $u\in S$ and $v\in T$ then $l\' (u) + l\' (v) = l(u) + l(v)$.
-			\item if $u\notin S$ and $v\notin T$, $l\' (u) = l(u)$ and $l\' (v) = l(v)$, 
+			\item If $u\in S$ and $v\in T$ then $l\' (u) + l\' (v) = l(u) + l(v)$.
+			\item If $u\notin S$ and $v\notin T$, $l\' (u) = l(u)$ and $l\' (v) = l(v)$, 
 				so $l\' (u) + l\' (v) = l(u) + l(v)$.
-			\item if $u\in S$ and $v\notin T$, $l\' (u) - \alpha$ and $l\' (v) = l(v)$. 
-				We know $\alpha = \min_{u\in S,v\notin T} \{l(u) + l(v) - w_{uv}\}$, 
-				which means $\alpha \leq l(u) + l(v) - w_{uv}$, and thus 
+			\item If $u\in S$ and $v\notin T$, $l\' (u)=l(u) - \delta$ and $l\' (v) = l(v)$. 
+				We know $\delta = \min_{u\in S,v\notin T} \{l(u) + l(v) - w_{uv}\}$, 
+				which means $\delta \leq l(u) + l(v) - w_{uv}$, and thus 
 				$l\' (u) + l\' (v) \geq w_{uv}$.
-			\item if $u\notin S$ and $v\in T$, $l\' (u) = l(u)$ and $l\' (v) = l(v) + 
-				\alpha$, which is clearly feasible.
+			\item If $u\notin S$ and $v\in T$, $l\' (u) = l(u)$ and $l\' (v) = l(v) + 
+				\delta$, which is clearly feasible.
 		\end{itemize}
-		(1) and (2) follow from above. To see (3), note that there is some $(u,v)$ with 
-		$u\in S$, $v\in T$ such that $\alpha = l(u) + l(v) - w_{uv}$, so when we take 
-		$l\' (u) = l(u) - \alpha$ and $l\' (v) = l(v)$, we get 
-		\begin{align*}
-			l\' (u) + l\' (v) - w_{uv} &= l(u) - \alpha + l(v) - w_{uv} \\
-						   &= l(u) + l(v) - w_{uv} - \alpha \\
-						   &= \alpha - \alpha \\
-						   &= 0.
-		\end{align*}
-		This is exactly what it means for an edge $(u,v)$ to be in $E_l$.
 	\end{proof}
+	We also need to show that this labeling increases the size of our equality graph.
+	\begin{lemma}
+		Given an initial feasible labeling $l$ and the labeling $l^{'}$, the following 
+		hold:
+		\begin{enumerate}
+			\item If $(u,v)\in E_l$ and $u\in S$, $v\in T$, then $(u,v)\in E_{l^{'}}$.
+			\item If $(u,v)\in E_l$ and $u\notin S$, $v\notin T$, then $(u,v)\in 
+				E_{l^{'}}$.
+			\item If $u\notin S$ and $v\in T$, then $(u,v)\notin E_l$.
+			\item If $u\in S$ and $v\notin T$ then $(u,v)\notin E_l$.
+			\item There exists some $(u,v)$ such that $u\in S$ and $v\notin T$, and 
+				$(u,v)\in E_{l^{'}}$. 
+		\end{enumerate}
+	\end{lemma}
+	\begin{proof}
+		The first two are clear, and tell us that we are not removing anything from our 
+		equality graph when we adjust our labeling. To see the third we addres two cases:
+		\begin{itemize}
+			\item Suppose that $(u,v)\in M$ for $u\notin S$ and $v\in T$.
+			\item 
+	\end{proof}
+
+	\begin{theorem}
+		$|E_l| \leq |E_{l^{'}}|$.
+	\end{theorem}
+
 	We now look at the Hungarian method for finding maximum-weight matchings on bipartite graphs. 
 	This method was originally developed by Kuhn and Munkres, who named it in honor of the Hungarian 
 	mathematicians K\H{o}nig and Egervary.
@@ -281,14 +303,19 @@ vertex cover, respectively.
 		\caption{Bipartite graph (left) and corresponding equality graph (right) with initial 
 		matching}
 	\end{figure}
-	Our initial matching is $M = \{(B,E), (C,D)\}$ (see Figure 3). Note that the current state of 
+	Our initial matching is $M = \{(\mbox{B},\mbox{E}), (\mbox{C},\mbox{D})\}$ (see Figure 3.3). 
+	Note that the current state of 
 	the graph is 
 	primal-dual feasible. Our algorithm chooses an exposed vertex in $U$, say $A$. So we have 
-	$S=\{A\}$ and $T=\emptyset$. We have that $N_l (S) \neq T$, so we find $E\in N_l (S)\setminus T
-	$. $E$ is matched, so we grow our alternating tree as follows: $S := S\cup \{B\} = \{A,B\}$, 
-	$T := T\cup \{E\} = \{E\}$. At this point $N_l (S) = T$, so we adjust our dual variables. 
-	Calculate $\alpha = \min _{u\in S,v\notin T} \{l(u) + l(v) - w_{uv}\} = 2$ from edge $(B,F)$. 
-	Our new equality graph is shown in Figure 4.
+	$S=\{\mbox{A}\}$ and $T=\emptyset$. We have that $N_l (S) \neq T$, so we find $mbox{E}\in N_l 
+	(S)\setminus T
+	$. $\mbox{E}$ is matched, so we grow our alternating tree as follows: $S := S\cup \{\mbox{B}\} 
+	= \{\mbox{A},\mbox{B}\}$, 
+	$T := T\cup \{\mbox{E}\} = \{\mbox{E}\}$. At this point $N_l (S) = T$, so we adjust our dual 
+	variables. 
+	Calculate $\alpha = \min _{u\in S,v\notin T} \{l(u) + l(v) - w_{uv}\} = 2$ from edge 
+	$(\mbox{B},\mbox{F})$. 
+	Our new equality graph is shown in Figure 3.4.
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
@@ -310,11 +337,15 @@ vertex cover, respectively.
 		\end{tikzpicture}
 		\caption{Second equality graph.}
 	\end{figure}
-	Now, $S = \{A,B\}$ is the same, but $N_l (S) = \{E,F\}$ has changed. $T = \{E\}$, so 
+	Now, $S = \{\mbox{A},\mbox{B}\}$ is the same, but $N_l (S) = \{\mbox{E},\mbox{F}\}$ has changed. 
+	$T = \{E\}$, so 
 	$N_l (S) \neq T$. So we choose $F\in N_l (S)\setminus T$. $F$ is unmatched, meaning it is 
-	an endpoint of an augmenting path. In particular, $p = A,E,B,F$ is an augmenting path. Thus we 
-	improve our matching with $M := M\oplus p = \{(A,E), (B,F), (C,D)\}$. Our equality graph with 
-	the new matching is given in Figure 5.
+	an endpoint of an augmenting path. In particular, $p = \mbox{A}\to \mbox{E}\to \mbox{B}\to 
+	\mbox{F}$ 
+	is an augmenting path. Thus we 
+	improve our matching with $M := M\oplus p = \{(\mbox{A},\mbox{E}), (\mbox{B},\mbox{F}), 
+	(\mbox{C},\mbox{D})\}$. Our equality graph with 
+	the new matching is given in Figure 3.5.
 	\begin{figure}[H]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
