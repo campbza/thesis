@@ -11,10 +11,10 @@
 \contentsline {section}{\numberline {3.1}Preliminaries}{25}
 \contentsline {section}{\numberline {3.2}The Hungarian Algorithm}{29}
 \contentsline {chapter}{Chapter 4: The Primal-Dual Method and Auction Algorithms}{33}
-\contentsline {section}{\numberline {4.1}The Classical Primal-Dual Method}{33}
-\contentsline {section}{\numberline {4.2}The Primal-Dual Method for Weighted Matchings}{39}
-\contentsline {section}{\numberline {4.3}Auction Algorithms}{42}
+\contentsline {section}{\numberline {4.1}The Classical Primal-Dual Method}{34}
+\contentsline {section}{\numberline {4.2}The Primal-Dual Method for Weighted Matchings}{40}
+\contentsline {section}{\numberline {4.3}Auction Algorithms}{43}
 \contentsline {subsection}{\numberline {4.3.1}The Naive Algorithm}{44}
 \contentsline {subsection}{\numberline {4.3.2}The Auction Algorithm}{46}
 \contentsline {section}{\numberline {4.4}Concluding Remarks}{48}
-\contentsline {chapter}{References}{49}
+\contentsline {chapter}{References}{51}

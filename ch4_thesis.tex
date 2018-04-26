@@ -8,6 +8,12 @@
 	cost subset 
 	$E\' \subset E$ that satisfies some criteria. Our maximum-weight matching problem is an example
 	of this.
+
+	We will also look at a two algorithms for solving auctions. Oftentimes, auctions can be 
+	modelled by weighted bipartite graphs, and we approach them as a special case of the 
+	weighted bipartite matching problem. However, we will see that in general we do not attain 
+	exact solutions, only approximate ones. This will hint at some of the further applications of 
+	the primal-dual method.
 \begin{section}{The Classical Primal-Dual Method}
 	We begin by looking at what is known as the ``classical'' primal-dual method, which is concerned 
 	with linear programs for polynomial-time solvable optimization problems.
@@ -24,28 +30,27 @@
 		& \text{subject to } & A^{T}\mathbf{y} & \leq \mathbf{c} \\
 		&& \mathbf{y} & \geq 0.
 	\end{alignat}
-	We first define a concept that has been subtly at work throughout this thesis. 
+	We first define a concept that has secretly been at work throughout this thesis. 
 	\begin{definition}{(Complementary slackness)}
 		Given two linear programs in the form above, the \emph{primal complementary slackness 
-		conditions} are the conditions which, given primal solution $\mathbf{x}$, 
-		are necessary for a dual solution $\mathbf{y}$:
+		conditions} are the conditions:
 		\[
 			x_j > 0 \implies A^{j}\mathbf{y} = c_j,
 		\]
 		where $A^{j}$ is the $j$th column of $A$. Similarly, the \emph{dual complementary 
-		slackness conditions} are the conditions which, given dual solution $\mathbf{y}$, are 
-		necessary for a primal solution $\mathbf{x}$:
+		slackness conditions} are the conditions:
 		\[
 			y_i > 0 \implies A_i\mathbf{x} = b_i,
 		\]
 		where $A_i$ is the $i$th row of $A$. 
-		
-		Together, these conditions give us necessary and 
-		sufficient conditions for solving the primal-dual system, which we will prove. The 
-		(maximization) primal slackness variables are given by 
+	\end{definition}
+		These conditions say that for a positive solution in the primal (dual), the corresponding 
+		constraint in the dual (primal) is strict. What is surprising is that
+		together, these conditions give us necessary and 
+		sufficient conditions for solving a primal-dual system of linear programs, 
+		which we will prove. The (maximization) primal slackness variables are given by 
 		$\mathbf{s} = \mathbf{b} - A\mathbf{x}$. The dual slackness variables are given by 
 		$\mathbf{t} = A^{T}\mathbf{y} - \mathbf{c}$.
-	\end{definition}
 	\begin{theorem}
 		Let $\mathbf{x}$ be a primal feasible solution, and $\mathbf{y}$ a dual feasible 
 		solution. Let $\mathbf{s}$ and $\mathbf{t}$ be the corresponding slackness variables. 
@@ -56,10 +61,13 @@
 			y_is_i &= 0 \quad \text{for all } i
 		\end{align}
 	\end{theorem}
+	Before we prove this, note that this says we cannot have optimality \emph{and} have slackness in 
+	both a variable of the primal and a dual constraint, and vice versa; we can only have slackness 
+	in one of them.
 	\begin{proof}
 		Let $u_i = y_is_i$ and $v_j = x_jt_j$, and $\mathbf{u} = \sum_i u_i$, 
 		$\mathbf{v} = \sum_j v_j$. Then $\mathbf{u} = 0$ and $\mathbf{v} = 0$ if and only if 
-		(7) and (8) hold. Also, 
+		(4.7) and (4.8) hold. Also, 
 		\begin{align*}
 			\mathbf{u} + \mathbf{v} &= \sum y_is_i + \sum x_jt_j \\
 						&= \sum y_i(b_i - A_ix_i) + \sum x_j (A^{T}_jy_j-c_j)\\
@@ -84,20 +92,22 @@
 	%Maximum matching ILP%
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{u,v} c_{uv} x_{uv}& \\
-		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \forall u\in U&, \\
-				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad \forall v\in V &, \\
+		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \text{for all } u\in U& \\
+				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad \text{for all } 
+				     v\in V & \\
 				&& x_{uv} & \geq 0.
 	\end{alignat}
 	and its dual
 	%Vertex cover ILP%
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_u y_u + \sum_v y_v& \\
-		& \text{subject to } \quad & y_u + y_v & \geq c_{uv}, & \quad \forall 
-					u\in U,\ v\in V &, \\
+		& \text{subject to } \quad & y_u + y_v & \geq c_{uv}, & \quad \text{for all } 
+					u\in U,\ v\in V & \\
 				    && y_u,y_v & \geq 0.
 	\end{alignat}
-	The format here is a little different, since our primal is a maximization problem and the dual 
-	is a minimization, but it's easy enough to reverse the roles. It's easy to see our 
+	The format here is a little different than what we have been working with in the thesis thus 
+	far, since our primal is a maximization problem and the dual 
+	is a minimization, but it is not difficult to switch between the two. Our 
 	corresponding primal complementary slackness conditions are
 	\begin{equation}
 		x_{uv} > 0 \implies y_u + y_v = c_{uv}.
@@ -110,9 +120,9 @@
 	In general, the slackness conditions guide us in our algorithm -- they tells us how, given a 
 	solution to one of the problems, we should augment the solution to the other. For example, the 
 	algorithm we presented for maximum-weight matching/minimum vertex cover intializes with 
-	a solution to both the primal and dual that satisfies conditions (8) and (10); the algorithm 
-	then at each step works to decrease the number of conditions in (9) that are unsatisfied, while 
-	maintaining satisfiability of (8) and (10). This method is not unique to the Hungarian 
+	a solution to both the primal and dual that satisfies conditions (4.16) and (4.18); the algorithm 
+	then at each step works to decrease the number of conditions in (4.17) that are unsatisfied, 
+	while maintaining satisfiability of (4.16) and (4.18). This method is not unique to the Hungarian 
 	algorithm. In fact, the Hungarian algorithm paved the way for this general method, which we 
 	describe presently.
 
@@ -120,10 +130,10 @@
 	a dual feasible solution $\mathbf{y}$. We can then state the problem of finding a feasible 
 	primal solution $\mathbf{x}$ that obeys our complementary slackness conditions as another 
 	\emph{restricted} linear program. Define the sets $A = \{j\ |\ A^{j}\mathbf{y} = c_j\}$ and 
-	$B = \{i\ |\ y_i = 0\}$. So $A$ tells us which dual constraints (5) are tight, 
+	$B = \{i\ |\ y_i = 0\}$. So $A$ tells us which dual constraints (4.5) are tight, 
 	given the solution $\mathbf{y}$, and $B$ tells us which $y_i$ are 0. What we want to do is 
 	give a linear program to find a solution $\mathbf{x}$ that minimizes the 
-	``violation'' of the complementary slackness conditions and the primal constraints, and to do 
+	``violation'' of the complementary slackness conditions and the primal constraints. To do 
 	so we will index our variables by these sets. We will 
 	have slack variables $s_i$ which will describe the difference between $A_i\mathbf{x}$ and $b_i$ 
 	for $i\notin A$. We do this because we want to look at all $y_i > 0$ where the we do not 
@@ -133,24 +143,26 @@
 	So we give the following restricted primal linear program:
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{i\notin B} s_i + \sum_{j\notin A} x_j & \\
-		& \text{subject to } & A_i\mathbf{x} & \geq b_i, & \quad i\in B &, \\
-				     && A_i\mathbf{x} - b_i & = s_i, & \quad i\notin B &, \\
+		& \text{subject to } & A_i\mathbf{x} & \geq b_i, & \quad \text{for all } i\in B & \\
+				     && A_i\mathbf{x} - b_i & = s_i, & \quad \text{for all }i\notin B & \\
 				     && \mathbf{x} & \geq 0, \\
 				     && \mathbf{s} & \geq 0.
 	\end{alignat}
+
 	Observe that if this restricted primal has a feasible solution $(\mathbf{x},\mathbf{s})$ such 
-	that the objective function is 0, then $\mathbf{x}$ is a feasible primal solution that 
-	satisfies the complementary slackness conditions for the dual solution $\mathbf{y}$. This 
+	that the objective function evaluates to zero, then $\mathbf{x}$ is a feasible primal solution 
+	that satisfies the complementary slackness conditions for the dual solution $\mathbf{y}$. This 
 	means that $\mathbf{x}$ and $\mathbf{y}$ are optimal primal and dual solutions. If, however, 
-	the optimal solution to this restricted primal has value greater than 0, more work is required. 
-	We can consider the dual of the restricted primal:
+	the optimal solution to this restricted primal has value greater than zero, more work is 
+	required. We can then consider the dual of the restricted primal:
 	\begin{alignat}{3}
 		& \text{maximize } & \mathbf{b}^{T}\mathbf{w} & \\
-		& \text{subject to } & A^{j}\mathbf{w} & \leq 0, & \quad j\in A &, \\
-				     && A^{j}\mathbf{w} & \leq 1, & \quad j\notin A &, \\
-				     && w_i\' & \geq -1, & \quad i\notin B &, \\
-				     && w_i\' & \geq 0. & \quad i\in B &.
+		& \text{subject to } & A^{j}\mathbf{w} & \leq 0, & \quad \text{for all }j\in A & \\
+				     && A^{j}\mathbf{w} & \leq 1, & \quad \text{for all } j\notin A & \\
+				     && w_i\' & \geq -1, & \quad \text{for all }i\notin B & \\
+				     && w_i\' & \geq 0. & \quad i\in B
 	\end{alignat}
+
 	What we want here is to improve our dual solution. By assumption, the optimal solution to this 
 	linear program's primal is greater than 0, so we know that this dual has a solution 
 	$\mathbf{w}$ such that $\mathbf{b}^{T}\mathbf{w} > 0$. What we want is the existence of 
@@ -163,21 +175,23 @@
 		y_i + \epsilon w_i &\geq 0 \\
 		A^{T}_j y + A^T_j \epsilon w & \leq c_j.
 	\end{align}
-	Let's consider the first one. When $w_i > 0$, we are fine; we need to be careful when 
-	$w_i < 0$ since this could potentially violate the inequality. Solving in this way, we get 
-	a first bound on $\epsilon$:
+	Let us consider the first one. When $w_i > 0$, we are fine since clearly 
+	$y_i +\epsilon w_i > 0$. However, we need to be careful when 
+	$w_i < 0$ since this could potentially violate the inequality (4.29). So we need that
 	\[
 		\epsilon \leq \min_{i\in B: w_i < 0} (-y_i/w_i).
 	\]
-	Now let's address the second inequality. When $A^{T}_jw \leq 0$, we are defintely okay. We 
-	need to be careful about violating the constraint when $A^{T}w > 0$. Thus, we can calculate a 
-	second bound on $\epsilon$:
+
+	Now let's address the second inequality (4.30). When $A^{T}_jw \leq 0$, we again don't need 
+	to worry. We 
+	need to be careful about violating the constraint when $A^{T}w > 0$. Thus, we need that
 	\[
 		\epsilon \leq \min_{j\in A: A^{T}_jw > 0} \frac{c_j-A^{T}_jy}{A^{T}_j w}.
 	\]
-	If we choose the lower of these two $\epsilon$ values, we obtain a new feasible dual solution 
-	that has greater objective value. We can then work by reiterating the procedure, with the hope 
-	that we find an optimal primal solution.
+	If we choose the minimum of these two $\epsilon$ values, we obtain a new feasible dual solution 
+	that has greater objective value than our original dual solution. 
+	We can then work by reiterating the procedure, with the hope that we find an optimal primal 
+	solution.
 
 	It's not immediately clear why reducing our original linear programs to a series of linear 
 	programs is heplful. However,  note that the vector $\mathbf{c}$ has totally disappeared in 
@@ -186,8 +200,8 @@
 	into unweighted parts, which are easier to solve. Oftentimes, it is the case that 
 	we can interpret these unweighted problems as purely combinatorial problems, which means that 
 	instead of actually solving the problem with linear programming, we can solve it by 
-	combinatorial 
-	methods. Using a combinatorial algorithm to find a solution $\mathbf{x}$ that obeys the 
+	combinatorial methods. 
+	Using a combinatorial algorithm to find a solution $\mathbf{x}$ that obeys the 
 	complementary slackness conditions, or to find an improved dual solution $\mathbf{y}$, is 
 	oftentimes more efficient.
 \end{section}
@@ -216,29 +230,30 @@
 	We need to start with a dual feasible solution, and try to find a primal solution that 
 	minimizes the violation of the constraints and slackness conditions. We can start with the 
 	trivial dual solution of $y_u,y_v = 0$ for all $u,v$. Let's now think about our primal 
-	complementary slackness. The set $A$ is given by $\{(u,v)\in E\ :\ y_u + y_v = c_{uv}\}$. 
+	complementary slackness conditions. 
+	The set $A$ is given by $\{(u,v)\in E\ :\ y_u + y_v = c_{uv}\}$. 
 	We know that these are the edges we want to include in our matching, and since we know our 
 	linear program has integer solutions at extreme points of the polyhedron, let's specify that 
-	$x_{uv} = 0$ for $(u,v)\notin a$. Now, our other slackness variables $s_u,s_v$ look like 
+	$x_{uv} = 0$ for $(u,v)\notin A$. Now, our other slackness variables $s_u,s_v$ look like 
 	\begin{align*}
-		\sum_{v:(u,v)\in E} x_{uv} - s_u &= 1 \\
-		\sum_{u:(u,v)\in E} x_{uv} - s_v &= 1.
+		\sum_{v:(u,v)\in E} x_{uv} - 1 &= s_u, \\
+		\sum_{u:(u,v)\in E} x_{uv} - 1 &= s_v.
 	\end{align*}
-	So we want to minimize over the sum of $s_u$ and $s_v$. Note that at this point, our set $B$ 
+	We want to minimize over the sum of $s_u$ and $s_v$. Note that at this point, our set $B$ 
 	consists of all vertices. So our restricted primal linear program is
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u\in U} s_u + \sum_{v\in v} s_v & \\
-		& \text{subject to } & \sum_v x_{uv}, - s_u & = 1 & \quad \text{for all } u & \\
-				     && \sum_u x_{uv}, - s_v & = 1 & \quad \text{for all } v & \\
-				     && x_{uv} & = 0, & \quad (u,v)\notin A \\
-				     && x_{uv} & \geq 0, & \quad (u,v)\in A \\
+		& \text{subject to } & \sum_v x_{uv}, - s_u & = 1, & \quad \text{for all } u\in U& \\
+				     && \sum_u x_{uv}, - s_v & = 1, & \quad \text{for all } v\in V& \\
+				     && x_{uv} & = 0, & \quad \text{for all }(u,v)\notin A \\
+				     && x_{uv} & \geq 0, & \quad \text{for all } (u,v)\in A \\
 				     && \mathbf{s} & \geq 0.
 	\end{alignat}
-	Let's first observe that all components of this restricted primal take on values 0 or 1, as 
+	It is a fact that all components of this restricted primal take on values zero or one, as 
 	in the original primal. Moreover, note that we have turned a weighted problem into an 
 	unweighted combinatorial problem. We've specified that we are not including any edge 
 	$(u,v)\notin A$ in our matching, and we are trying to include as many $(u,v)\in A$ as possible 
-	in our matching by minimizing the slackness variables. Note that the graph $G^{'} = (U,V,J)$ 
+	in our matching by minimizing the slackness variables. Note that the subgraph $G^{'} = (U,V,A)$ 
 	is exactly the equality subgraph as defined in the previous chapter! In our Hungarian algorithm 
 	we repeatedly sought to find maximum cardinality matchings within this subgraph, which is 
 	exactly what this restricted primal is having us do. This tells us that the problems of maximum 
@@ -268,9 +283,9 @@
 	So we get that we at least need that $\epsilon \leq \min_{(u,v)\notin A: w_u + w_v > 0}
 	\frac{c_{uv} - y_u - y_v}{w_u + w_v}$. We can refine this by noting that since 
 	$0 < w_u + w_v \leq 1$ for $(u,v)\notin A$, we have $\epsilon = \min_{(u,v)\notin A} 
-	(c_{uv} - y_u - y_v)$. Note that the negative of this is exactly the quantity we modify our 
-	labeling by in the Hungarian algorithm in the previous chapter. Thus we've found an 
-	$\epsilon$ that maintains dual feasibility, and increases the objectie function. We can use 
+	(c_{uv} - y_u - y_v)$. Note that the negative of this is exactly the quantity by which we 
+	modify our labeling by in the Hungarian algorithm. Thus we've found an 
+	$\epsilon$ that maintains dual feasibility, and increases the objective function. We can use 
 	this solution and revisit the restricted primal in order to look for an improved feasible 
 	primal solution.
 \end{section}
@@ -300,7 +315,7 @@
 	Our goal is to maximize the total amount earned in the auction -- i.e. to 
 	maximize $\sum_{(b,g)} c_{bg}$, under the constraint that no bidder gets more than one good, 
 	and no good is purchased by more than one bidder.
-	It will be useful for us to consider an alternate, but equivalent dual problem, which is 
+	It will be useful for us to consider an alternate but equivalent dual problem, which is 
 	suggested by our complementary slackness conditions. For a more detailed treatment of this 
 	equivalence, see Bertsimas and Tsitsiklis \cite{bertsimas1997introduction}. 
 	In the auction setting, it does not make 
@@ -344,12 +359,15 @@
 		(put them back into the set of unassigned bidders) with $b$; (2) bump the price of 
 		$g^{*}$ by some amount $\delta_b$. Intuitively, we want to increase $p_{g^{*}}$ by the 
 		largest 
-		amount while still maintaining the fact that $g^{*}$ offers maximal value to $b$. We can 
+		amount that still maintains the fact that $g^{*}$ offers maximal value to $b$. We can 
 		easily accomplish this by setting $\delta_b = v_b - w_b$, where $v_b = \max_{g\in A(b)} 
 		\{c_{bg} - p_g\} = p_{g^{*}}$ and $w_b = \max_{g\in A(b),\ g\neq g^{*}} 
 		\{c_{bg} - p_g\}$. 
 		This simply says that we are bumping the price $p_{g^{*}}$ by the difference in the 
-		profit of the best object and the profit of the second best object.
+		profit of the best object and the profit of the second best object for the current 
+		bidder. That is the essence of the naive algorithm: choose an unassigned bidder $b$, find 
+		an item that maximizes their individual value, bump the price of that good by 
+		$\delta_b$, and unassign the previous owner. We do this until all bidders are assigned.
 
 		This is a simple algorithm that has one major problem: there are cases in which it 
 		does not terminate. The issue is that the bidding increment $\delta_b$ is zero when 
@@ -405,11 +423,13 @@
 		\begin{align}
 			& c_{bg^{*}} - p_{g^{*}} \geq \max_{g\in A(b)} \{c_{bg} - p_g\} - \epsilon.
 		\end{align}
+
 		The new auction algorithm will be the same as the naive one, except in the way we 
-		adjust prices; now $\delta_b := v_b - w_b + \epsilon$. We give the pseudocode below. We 
-		will use a data structure called a queue, denoted $\mathcal{Q}$, to keep track of 
-		unassigned bidders. A queue works exactly how one might think: new elements are placed 
-		at the ``end,'' or enqueued, and members are removed from the ``top,'' or dequeued.
+		adjust prices; now $\delta_b := v_b - w_b + \epsilon$. We give the pseudocode in 
+		Figure 4.2. We will use a data structure called a queue, denoted $\mathcal{Q}$, to 
+		keep track of unassigned bidders. A queue works exactly how one might think: new 
+		elements are placed at the ``end,'' or enqueued, and members are removed from the 
+		``top,'' or dequeued.
 		\begin{figure}[h]
 		\begin{center}
 			\begin{minipage}{3in}
@@ -433,17 +453,19 @@
 				\li \Return Assignment and price vector
 			\end{codebox}
 			\end{minipage}
-			\caption{Pseudocode for the auction algorithm}
+			\caption{Pseudocode for the auction algorithm.}
 		\end{center}
 		\end{figure}
-		We first discuss why this algorithm terminates. 
+
+		We now discuss why this algorithm terminates in the case where our graph is fully dense.
 		The first thing we should note is that once all goods 
 		receive a bid the algorithm is done, since each person bids on the good they 
 		currently desire most. Now, suppose there is some good that receives $k$ bids. This will 
-		increase the good of this price by at least $k\epsilon$. Clearly there is some $k$ for 
-		which the good is less desirable than some other good that has not received any bids 
+		increase the price of this good by at least $k\epsilon$. Clearly there is some $k$ for 
+		which the good becomes less desirable than some other good that has not received any bids 
 		thus far. So it must be the case that a good can only receive a finite number of 
-		bids before it is considered inferior to some other good that has not been bid on. For 
+		bids before it is considered inferior to some other good that has not been bid on. We 
+		know this because prices \emph{always} increase when a bid/assignment is made. For 
 		the case in which our graph is not fully dense, see Bertsekas \cite{Bertsekas1992}, 
 		Appendix 2.
 	
@@ -451,9 +473,12 @@
 		solutions. Because we are relaxing our original complementary slackness constraint, 
 		we should not in general expect to get optimal solutions. 
 		In fact, optimality of our solution relies entirely on 
-		how we choose our $\epsilon$. It turns out that whatever $\epsilon$ is, 
+		how we choose our $\epsilon$. 
+		
+		It turns out that whatever $\epsilon$ is, 
 		an assignment of bidders and a price vector that together satisfy $\epsilon$-
-		complementary slackness will be within $n\epsilon$ of optimal. We state this formally.
+		complementary slackness will be within $n\epsilon$ of optimal, where $n=|B|$. 
+		We state this formally.
 		\begin{theorem}
 			A feasible assignment of bidders along with a price vector $\mathbf{p}$, 
 			which together satisfy $\epsilon$-complementary slackness, 
@@ -462,25 +487,28 @@
 			solution.
 		\end{theorem}
 		\begin{proof}
-			Let $\Gamma$ be the value of a total optimal assignment, and $\Omega$ the 
-			corresponding dual cost. So 
+			Let $\mathbf{OPT}(\Gamma)$ be the value of a total optimal assignment, and 
+			$\mathbf{OPT}(\Omega)$ the corresponding dual cost. So 
 			\begin{align}
-				\Gamma &= \max_{g^{*}\in A(b)} \sum_b c_{bg} \\
-				\Omega &= \min_{p_g} \{\sum_b \max_{g\in A(b)} \{c_{bg} - p_g\} + 
-				\sum_g p_g\},
+				\mathbf{OPT}(\Gamma) &= \max_{g^{*}\in A(b)} \sum_b c_{bg^{*}} \\
+				\mathbf{OPT}(\Omega) &= \min_{p_g} \{\sum_b \max_{g\in A(b)} 
+				\{c_{bg} - p_g\} + \sum_g p_g\},
 			\end{align}
 			where in (4.56) we specify that no good is assigned to two bidders, and no bidder 
 			is assigned to two goods.
 
-			Firstly, weak duality tells us that $\Gamma \leq \Omega$. Since our assignment 
-			and prices satisfy $\epsilon$-complementary slackness, we know that 
+			Firstly, weak duality tells us that $\mathbf{OPT}(\Gamma) \leq 
+			\mathbf{OPT}(\Omega)$. Since our assignment 
+			and prices satisfy $\epsilon$-complementary slackness, we know that for all $b,g$
 			\[
 				\max_{g\in A(b)} \{c_{bg} - p_g\} - \epsilon \leq c_{bg^{*}} - p_{g^{*}}.
 			\]
 			This means that we have 
 			\[
-				\Omega \leq \sum_b \left(\max_{g\in A(b)} \{c_{bg} - p_g\} + p_{g^{*}} 
-				\right) \leq \sum_b c_{bg^{*}} + n\epsilon \leq \Gamma + n\epsilon.
+				\mathbf{OPT}(\Omega) \leq \sum_b \left(\max_{g\in A(b)} 
+				\{c_{bg} - p_g\} + p_{g^{*}} 
+				\right) \leq \sum_b c_{bg^{*}} + n\epsilon \leq 
+				\mathbf{OPT}(\Gamma) + n\epsilon.
 			\]
 			This shows that both our primal and dual objective functions are within 
 			$n\epsilon$ of optimality.

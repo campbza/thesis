@@ -103,7 +103,6 @@ the minimum weight vertex cover problems, respectively.
 		So $\sum_{(u,v)\in M\'} w_{uv} \leq \sum_{(u,v)\in M} w_{uv}$, 
 		meaning that $M$ must be a maximum weight matching.
 	\end{proof}
-	
 	This theorem tells us that if we can give an algorithm for finding a perfect matching in the 
 	equality subgraph (if such a matching exists), then we can find a maximum weight matching in the 
 	graph. To do this, we will first define a few terms. 
@@ -111,7 +110,7 @@ the minimum weight vertex cover problems, respectively.
 	As in Chapter 2, let $R$ be the set of vertices reachable from unmatched vertices in $U$ via 
 	alternating paths, 
 	and let $S:=R\cap U$, $T:=R\cap V$. We will use these sets to construct our collection of 
-	alternating trees as defined in Chapter 2. Let $M$ be our maximum cardinality matching.
+	alternating trees.
 	
 	Now, consider a feasible labeling $l$ on a graph $G = (U,V,E)$ and set 
 	\[
@@ -199,7 +198,7 @@ the minimum weight vertex cover problems, respectively.
 				\Procname{$\proc{Hungarian-Max-Assign} (U,V,E,w)$}
 				\li $l_u := \max_{v} c_{uv}$
 				\li $l_v := 0$
-				\li Repeatedly do:
+				\li Repeat the following:
 				\li \quad $M := $ $\proc{Max-Card-Matching} (U,V,G_l)$
 				\li \quad \If $M$ is a perfect matching in $G_l$
 				\li \quad	\Then 
@@ -212,6 +211,7 @@ the minimum weight vertex cover problems, respectively.
 	\end{center}
 		\caption{The Hungarian Algorithm}
 	\end{figure}
+
 	The correctness of the algorithm follows from the lemma and theorem. Note that our labeling $l$ 
 	remains feasible by Lemma 3.4, and the equality graph increases in size by Lemma 3.5. This tells 
 	us that, assuming our graph $G$ has a perfect matching, one will eventually be found by this 
