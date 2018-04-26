@@ -4,15 +4,17 @@ and show how this problem is intimately related to the matching problem through 
 We also use duality theory to shed light on the max-flow min-cut theorem.
 
 \begin{section}{The Vertex Cover Problem}
-	We begin this section by defining a new problem -- the vertex cover problem. 
+	We begin this section by defining the vertex cover problem. 
 	Again, this is a problem that can be 
-	posed for general graphs, but we will be restricting our attention to bipartite graphs. 
-	This is a good idea for many reasons, the most pertinent being that this problem is $NP$-
+	posed for graphs in general (not necessarily bipartite), but we will be restricting our 
+	attention to bipartite graphs. 
+	This is a good idea for many reasons, the most pertinent being that this problem is NP-
 	complete in the general case.
 	\begin{definition}
 		Let $G = (U,V,E)$ be a bipartite graph. A subset $C\subset U\cup V$ is said to be a 
 		\emph{vertex cover} if for each $(u,v)\in E$ we have that either $u\in C$ or $v\in C$. A 
-		cover $C$ is a \emph{minimum vertex cover} if for any other cover $C\'$, $|C|\leq |C\'|$.
+		vertex cover $C$ on $G$ is a \emph{minimum vertex cover} if for any other vertex cover 
+		$C\'$ on $G$, we have that $|C|\leq |C\'|$.
 	\end{definition}
 	Using what we have already learned, we now can specify at least one relation between matchings 
 	and vertex covers: namely, the set of all vertices incident to at least one edge in any maximum 
@@ -71,8 +73,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	to an important theorem, but we must first prove a lemma.
 
 	\begin{lemma}
-		Let $G=(U,V,E)$ be a bipartite graph. Let $M$ be a matching on $G$ and $C$ a cover on 
-		$G$ such that $|M| = |C|$. Then $M$ is a maximum matching and $C$ is a minimum 
+		Let $G=(U,V,E)$ be a bipartite graph. Let $M$ be a matching on $G$ and $C$ a vertex 
+		cover on $G$ such that $|M| = |C|$. Then $M$ is a maximum matching and $C$ is a minimum 
 		vertex cover.
 	\end{lemma}
 
@@ -86,8 +88,75 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		Thus, if $|M| = |C|$ we have equalities above, which means that the size of a maximum 
 		matching is equal to the size of a minimum covering.
 	\end{proof}
-	Before we prove the following theorem, we define a simple term: an $M$-alternating path is an 
-	alternating path with respect to a matching $M$.
+	Before we prove the following theorem, we want to be able to talk about collections of 
+	alternating paths, as it will be useful to us in discussing the methods of finding maximum 
+	matchings on graphs.
+	\begin{definition}
+		Let $G = (U,V,E)$ be a bipartite graph, and $M$ a matching on $G$. An 
+		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
+		conditions:
+		\begin{itemize}
+			\item the tree contains exactly one node $u\in U$. We call $u$ the 
+				\emph{root} of the tree.
+			\item all paths between the root and any other node in the tree are 
+				alternating paths.
+		\end{itemize}
+	\end{definition}
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
+		
+		%left nodes
+		\node (n1) at (1,10) {A};
+		\node (n2) at (1,8) {B};
+		\node (n3) at (1,6) {C};
+		\node (n4) at (1,4) {D};
+		\node (n5) at (1,2) {E};
+
+		%right nodes
+		\node (n6) at (4,10) {F};
+		\node (n7) at (4,8) {G};
+		\node (n8) at (4,6) {H};
+		\node (n9) at (4,4) {I};
+		\node (n10) at (4,2) {J};
+		
+		%edges
+		\draw[line width=0.5mm] (n1) -- (n6);
+		\draw[thick,dashed] (n1) -- (n8);
+		\draw[thick,dashed] (n2) -- (n6);
+		\draw[thick,dashed] (n2) -- (n7);
+		\draw[thick,dashed] (n3) -- (n6);
+		\draw[line width=0.5mm] (n4) -- (n7);
+		\draw[thick,dashed] (n4) -- (n8);
+		\draw[thick,dashed] (n2) -- (n9);
+		\draw[line width=0.5mm] (n5) -- (n9);
+		\draw[thick,dashed] (n5) -- (n10);
+
+		%alternating tree
+		\node (n11) at (7,6) {B};
+		\node (n12) at (9,8) {F};
+		\node (n13) at (9,6) {G};
+		\node (n14) at (9,4) {I};
+		\node (n15) at (11,8) {A};
+		\node (n16) at (11,6) {D};
+		\node (n17) at (11,4) {E};
+		\node (n18) at (13,8) {H};
+		\node (n20) at (13,4) {J};
+
+		%tree edges
+		\draw[thick,dashed] (n11) -- (n12);
+		\draw[thick,dashed] (n11) -- (n13);
+		\draw[thick,dashed] (n11) -- (n14);
+		\draw[line width=0.5mm] (n12) -- (n15);
+		\draw[line width=0.5mm] (n13) -- (n16);
+		\draw[line width=0.5mm] (n14) -- (n17);
+		\draw[thick,dashed] (n15) -- (n18);
+		\draw[thick,dashed] (n17) -- (n20);
+		\end{tikzpicture}
+		\caption{Bipartite graph with matching (left) and corresponding alternating tree 
+		rooted at vertex B (right).}
+	\end{figure}
+
 	\begin{theorem}{(K\H{o}nig-Egervary)}
 		For any bipartite graph $G$, if $M$ is a maximum matching on $G$ and $C$ is a minimum 
 		vertex cover  on $G$, then $|M| = |C|$.
@@ -96,30 +165,28 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		Let $G=(U,V,E)$ be a bipartite graph, and let $M$ be a maximum matching on $G$. 
 		Furthermore, define
 		\begin{align}
-			A &:= \{s\in S\; |\; s \text{ unmatched}\}\\
-			B &:= \{\text{all vertices connected to vertices in $A$ by 
-			$M$-alternating paths}\}.
+			F &:= \{u\in U\; |\; u \text{ unmatched}\}\\
+			R &:= \{\text{all vertices connected to vertices in $F$ by alternating paths}\}.
 		\end{align}
-		Let $L = B\cap U$ and $R = B\cap V$. Denote $N(L)$ to be the set of all vertices 
-		connected to elements of $L$ (i.e. the ``neighbors'' of $L$). Then we have the following:
-		\begin{enumerate}
-			\item Every vertex in $R$ is matched.
-			\item $N(L) = R$.
-		\end{enumerate}
-
+		Let $S = R\cap U$ and $T = R\cap V$. Denote $N(S)$ to be the set of all vertices 
+		connected to elements of $S$ (i.e. the ``neighbors'' of $S$). Then we have the following:
+		\begin{align*}
+			&(1)\text{ Every vertex in $T$ is matched;}\\
+			&(2)\ N(S) = T.
+		\end{align*}
 		The first claim comes from the fact that, if $M$ is a 
-		maximum matching, then our alternating paths that start at a vertex in $A$ must have 
+		maximum matching, then our alternating paths that start at a vertex in $F$ must have 
 		an even length $\geq 2$. Otherwise, we would have an augmenting path, 
 		which contradicts our assumption that $M$ is a maximum matching.
-		The second claim comes from the fact that every node in $N(L)$ is connected to vertices 
-		in $A$ by an alternating path. 
+		The second claim comes from the fact that every node in $N(S)$ is connected to vertices 
+		in $F$ by an alternating path. 
 
-		Now, define $K := (U\setminus L)\cup R$. Every edge 
-		in $G$ must have one of its endpoints in $K$. If not, then there would be an 
-		edge with one endpoint in $L$ and one endpoint in $V\setminus R$, which contradicts 
-		$N(L) = R$. Therefore $K$ is a vertex cover of $G$. Moreover, $|K| = |M|$, since for each 
-		edge in $M$ we've included one of its endpoints in $K$ (the vertices we've chosen are 
-		those in $N(L)$ and those in $U\setminus L$). Thus, by the previous lemma, $K$ is 
+		Now, define $C := (U\setminus S)\cup T$. Every edge 
+		in $G$ must have one of its endpoints in $C$. If not, then there would be an 
+		edge with one endpoint in $S$ and one endpoint in $V\setminus T$, which contradicts 
+		$N(S) = T$. Therefore $C$ is a vertex cover of $G$. Moreover, $|C| = |M|$, since for each 
+		edge in $M$ we've included one of its endpoints in $C$ (the vertices we've chosen are 
+		those in $N(S)$ and those in $U\setminus S$). Thus, by the previous lemma, $C$ is 
 		a minimum covering.
 	\end{proof}
 
@@ -134,18 +201,21 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	between certain combinatorial problems that we are interested in solving.
 	\begin{definition}
 		Let the \emph{primal linear program} be the following linear program.
-		\begin{alignat*}{2}
-			& \text{maximize } & \mathbf{c}^{T}\mathbf{x} \\
-			& \text{subject to } & A\mathbf{x} & \leq \mathbf{b} \\
-			&& \mathbf{x} &\geq 0
-		\end{alignat*}
+		\begin{alignat}{3}
+			& \text{maximize } & \sum_{i=1}^{n} c_{i} x_{i}& \\
+			& \text{subject to } \quad & \sum_{i=1}^{n} a_{ij} x_{i} & \leq b_{i}, & j & 
+			= 1, \dots , m \\
+					&& x_{i} & \geq 0, \quad & i & = 1, \dots, n.
+		\end{alignat}		
 		Then we define the \emph{dual linear program} of this primal linear program to be the 
 		following linear program.
-		\begin{alignat*}{2}
-			& \text{minimize } & \mathbf{b}^{T}\mathbf{y} \\
-			& \text{subject to } & A^{T}\mathbf{y} & \leq \mathbf{c} \\
-			&& \mathbf{y} &\geq 0
-		\end{alignat*}
+		\begin{alignat}{3}
+			& \text{minimize } & \sum_{j=1}^{m} b_{j} y_{j}& \\
+			& \text{subject to } \quad & \sum_{j=1}^{n} a_{ij} y_{j} & \geq c_{j}, & i & 
+			= 1, \dots , m \\
+					&& y_{j} & \geq 0, \quad & j & = 1, \dots, n.
+		\end{alignat}		
+
 		The dual of the dual is always the primal.
 	\end{definition}
 	In some settings we instead 
@@ -169,7 +239,10 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 
 	\begin{proof}
 		Suppose that $\mathbf{x} = (x_1, x_2,\dots,x_n)$ is a feasible solution to $\Gamma$, and 
-		$\mathbf{y} = (y_1, y_2, \dots y_m)$ is a feasible solution to $\Omega$. Because 
+		$\mathbf{y} = (y_1, y_2, \dots y_m)$ is a feasible solution to $\Omega$. 
+		So $\mathbf{OPT}(\Gamma) = \sum_{i=1}^{n} c_i x_i$ and 
+		$\mathbf{OPT}(\Omega) = \sum_{j=1}^{n} b_j y_j$.
+		Because 
 		$\mathbf{y}$ is dual feasible and all $x_i$ are nonnegative, we have 
 		\[
 			\sum_{j=1}^{m} b_j y_j \geq \sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij}x_i\right) 
@@ -177,26 +250,26 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		\]
 		Similarly, we have that 
 		\[
-			\sum_{i=1}^{n} c_i x_i \leq \sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij} y_j\right) 
+			\sum_{i=1}^{n} c_i x_i \leq \sum_{i=1}^{n}\left(\sum_{j=1}^{m} a_{ij} y_j\right) 
 			x_i.
 		\]
 		Note that by rearranging terms, we have the following equality:
 		\[
-			\sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij} y_j\right) 
+			\sum_{i=1}^{n}\left(\sum_{j=1}^{m} a_{ij} y_j\right) 
 			x_i =
 			\sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij}x_i\right) 
-			y_j.
+			y_j,
 		\]
-		Thus,
+		which shows that 
 		\[
-			\sum_{i=1}^{n} c_i x_i \leq
-			\sum_{i=1}^{n} c_i x_i \leq \sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij} y_j\right) 
+			\sum_{i=1}^{n} c_i x_i \leq 
+			\sum_{i=1}^{n}\left(\sum_{j=1}^{m} a_{ij} y_j\right) 
 			x_i =
-			\sum_{j=1}^{m} b_j y_j \geq \sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij}x_i\right) 
-			y_j \leq
-			\sum_{j=1}^{m} b_j y_j
+			\sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij}x_i\right) 
+			y_j \leq 
+			\sum_{j=1}^{m} b_j y_j,
 		\]
-		which shows $\mathbf{OPT}(\Gamma) \leq \mathbf{OPT}(\Omega)$.
+		so $\mathbf{OPT}(\Gamma) \leq \mathbf{OPT}(\Omega)$.
 	\end{proof}
 	What's surprising is the following theorem.
 
@@ -222,12 +295,13 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	more than one vertex in the matching; otherwise, the matching would be invalid. For a fixed 
 	vertex $u\in U$, the number of edges in the matching incident 
 	to $u$ is given by $\sum_{v\in V} x_{uv}$. So we want this to be less than or equal to one. 
-	Similarly, for any node $v\in V$, we want $\sum_{u\in U} x_{uv}$ to be less than or equal to 
+	Similarly, for any vertex $v\in V$, we want $\sum_{u\in U} x_{uv}$ to be less than or equal to 
 	one. This gives us the following linear program:
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{u,v} x_{uv}& \\
-		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \forall u\in U& \\
-				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad \forall v\in V & \\
+		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \text{for all } u\in U& \\
+				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad \text{for all } v\in 
+				     V & \\
 				&& x_{uv} & \in \{0,1\}.
 	\end{alignat}
 
@@ -240,12 +314,14 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 
 	Now let us try and construct the dual of this linear program. To do this we will need a variable 
 	$y_u$ for each vertex $u$. Similarly, we need a variable $y_v$ for each vertex $v$. Our 
-	objective will be to minimize over the sum of these $y_u$ and $y_v$. Since our constraint 
-	in the primal is the constant vector 1, our only constraint will be that $y_u + y_v \geq 1$. 
+	objective will be to minimize over the sum of these $y_u$ and $y_v$. Since our coefficient on 
+	$x_{uv}$
+	in the primal is the constant vector one, our only constraint will be that $y_u + y_v \geq 1$. 
 	This gives us the dual linear program:
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u\in U} y_u + \sum_{v\in V} y_v& \\
-		& \text{subject to } \quad & y_u + y_v & \geq 1, & \quad \text{for all } u\in U,v\in V & \\
+		& \text{subject to } \quad & y_u + y_v & \geq 1, & \quad \text{for all } 
+					u\in U,v\in V & \\
 				    && y_u,y_v & \geq 0.
 	\end{alignat}
 	This dual problem tells us that each edge must be ``covered'' by at least one of its incident 
@@ -264,14 +340,17 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	linear program:
 	\begin{alignat}{3}
 		& \text{maximize } & \sum_{u,v} w_{uv}x_{uv}& \\
-		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad \forall u\in U& \\
-				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad \forall v\in V & \\
+		& \text{subject to } \quad & \sum_{v} x_{uv} & \leq 1, & \quad 
+					\text{for all } u\in U& \\
+				     &\quad & \sum_{u} x_{uv} & \leq 1, & \quad 
+				     	\text{for all } v\in V & \\
 				&& x_{uv} & \geq 0.
 	\end{alignat}
 	Then the dual is given by:
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u} y_u + \sum_v y_v& \\
-		& \text{subject to } \quad & y_u + y_v & \geq w_{uv}, & \quad \forall u,v &, \\
+		& \text{subject to } \quad & y_u + y_v & \geq w_{uv}, & \quad \text{for all } u\in U,
+					v\in V & \\
 				    && y_u,y_v & \geq 0.
 	\end{alignat}
 	The dual is a sort of weighted vertex cover. One way to think about it is that each edge 
@@ -282,14 +361,13 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 
 	These two problems, the maximum weight matching and the minimum weight vertex cover, are the 
 	problems that the Hungarian algorithm solves, which we discuss in Chapter 3. For now, we digress 
-	and discuss the max-flow min-cut theorem as an ode to students who have taken a course in 
+	and discuss the max-flow min-cut theorem, as an ode to students who have taken a course in 
 	algorithms.
 \end{subsection}
 
 \begin{subsection}{The Max-Flow Min-Cut Theorem}
 	Here we demonstrate that a common problem discussed in algorithms courses, and a quite 
 	amazing theorem, is really a special case of what we have been discussing. 
-	
 	We first recall the definition of a flow network.
 	\begin{definition}
 		A \emph{flow network} $G = (V,E)$ is a directed graph in which each edge $(u,v)\in E$ 
@@ -299,12 +377,12 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	\end{definition}
 	Given a flow network, we can define a function on the network.
 	\begin{definition}
-		Let $G = (V,E)$ be a flow network. A \emph{flow} in $G$ is a function $f: V\times V \to 
+		Let $G = (V,E)$ be a flow network. A \emph{flow} on $G$ is a function $f: V\times V \to 
 		\R$ that satisfies the following:
 		\begin{itemize}
 			\item Capacity constraint: For all $u,v\in V$, $0\leq f(u,v) \leq 
 				c_{uv}$.
-			\item Conservation: For all $u\in V\setminus \{s,t\}$, we have 
+			\item Flow conservation: For all $u\in V\setminus \{s,t\}$, we have 
 				\[
 					\sum _{v\in V} f(v,u) = \sum_{v\in V} f(u,v).
 				\]
@@ -333,9 +411,11 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 			\draw[->,thick] (n4) -- node[draw=none, above] {2/2} ++ (n6);
 			\draw[->,thick] (n5) -- node[draw=none, below] {3/3} ++ (n6);
 		\end{tikzpicture}
-		\caption{Flow network with maximum flow of 5.}
+		\caption{Flow network with maximum flow of 5. Notation: $X/Y$ means an edge has capacity 
+		$Y$ and flow $X$, given by the flow function.}
 	\end{figure}
-	In Figure 2.2, we have a flow network with a corresponding flow. For example, the capacity 
+	In Figure 2.2, (from Cormen, Leiserson, Rivest, and Stein \cite{cormen2009introduction}) 
+	we have a flow network with a corresponding flow. For example, the capacity 
 	of the edge $(s,b)$ is $3$, and our flow function in sending a flow of value $2$ through 
 	this edge.
 
@@ -343,8 +423,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	to $t$. This is done using a method developed by Ford and Fulkerson which looks for augmenting 
 	paths in the residual graph (essentially the subgraph where the flows $f(u,v) < c_{uv}$. 
 	The reader should refer to Cormen, Leiserson, Rivest, and Stein 
-	\cite{cormen2009introduction} for a more detailed treatment.
-	Now, we recall the definition of a cut in a flow network.
+	\cite{cormen2009introduction} for a more detailed treatment. Now, we recall the definition 
+	of a cut in a flow network.
 	\begin{definition}
 		An $s-t$ \emph{cut} $(S,T)$ of a flow network $G=(V,E)$ is a partition of $V$ into 
 		sets $S$ and $T = V\setminus S$ such that $s\in S$ and $t\in T$. Given a flow $f$, the 
@@ -354,8 +434,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 			f(v,u).
 		\]
 		Finally, the \emph{capacity} of the cut is defined as $c(S,T) = 
-		\sum_{u\in S} \sum_{v\in T} c(u,v)$. A minimum cut has capacity less than or equal to 
-		all other cuts in the network.
+		\sum_{u\in S} \sum_{v\in T} c(u,v)$. A \emph{minimum cut} has capacity less than or 
+		equal to all other cuts in the network.
 	\end{definition}
 	One of the coolest and most surpising theorems in an algorithms course is that, given a flow 
 	network $G$, the value of the maximum flow on $G$ is equal to the capacity of the minimum 
@@ -386,15 +466,15 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	Now we want to find the dual of this program. 
 	Our sense (hopefully) is that the dual will somehow relate to minimum cuts, given the 
 	foreshadowing of the previous section. Let's see! We introduce variables $d_{uv}$ and $p_u$ for 
-	inequalities (2.18) and (2.19), respectively. Then the dual linear program is as follows:
+	inequalities (2.24) and (2.25), respectively. Then the dual linear program is as follows:
 	\begin{alignat*}{3}
 		& \text{minimize } & \sum_{(u,v)\in E} c_{uv} d_{uv}& \\
-		& \text{subject to } \quad & d_{uv} - p_u + p_v & \geq 0, & \quad (u,v)\in E &, \\
+		& \text{subject to } \quad & d_{uv} - p_u + p_v & \geq 0, & \quad (u,v)\in E & \\
 				    && p_s - p_t & \geq 1, & \\
 				    && d_{uv} & \geq 0, & \quad (u,v) \in E & \\
-				    && p_u,\ p_v \geq 0.
+				    && p_u,\ p_v & \geq 0.
 	\end{alignat*}
-	It is known that extreme point solutions to these linear programs takes on values 0 or 1 at 
+	It is known that extreme point solutions to these linear programs take on values zerp or one at 
 	each coordinate. Let us now consider an optimal dual solution $(\mathbf{d}^{*},\mathbf{p}^{*})$. 
 	First, in order to satisfy $p_s^{*} - p_{t}^{*} \geq 1$ with zero/one values, it must be the case 
 	that $p_s^{*} = 1$ and $p_t^{*} = 0$. This motivates an $s-t$ cut $(S,T)$ with $S$ consisting 
@@ -407,7 +487,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	of this $s-t$ cut, which must be a minimum cut. Strong duality tells us that this corresponds 
 	to the value of $f(t,s)$ in the primal linear program. 
 	
-	To make this clear, let us look back at our flow network in Figure 2.2. 
+	To make this clear, let us look back at our flow network in Figure 2.3. 
 	We expect that, given our discussion of the dual, we should be able to find a cut 
 	$(S,T)$ of the flow network that has value five. 
 	Moreover, this cut $(S,T)$ should be such that $S$ consists of vertices with value one, 
@@ -435,13 +515,16 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 			\draw[->,thick] (n4) -- node[draw=none, above] {2/2} ++ (n6);
 			\draw[->,thick] (n5) -- node[draw=none, below] {3/3} ++ (n6);
 		\end{tikzpicture}
-		\caption{Flow network with corresponding dual solution.}
+		\caption{Flow network with corresponding dual solution (bold edges are the edges in our 
+		cut).}
 	\end{figure}
-	In Figure 2.3, the $s-t$ cut corresponds to the sets $S= \{s,a,b\}$ and $T = \{c,d,t\}$; the 
-	edges in the cut are the bold edges $(a,c)$ and $(b,d)$. So the capacity of the cut is five, 
+	In Figure 2.4, the $s-t$ cut corresponds to the sets $S= \{\mbox{s},\mbox{a},\mbox{b}\}$ and 
+	$T = \{\mbox{c},\mbox{d},\mbox{t}\}$; the 
+	edges in the cut are the bold edges $(\mbox{a},\mbox{c})$ and $(\mbox{b},\mbox{d})$. 
+	So the capacity of the cut is five, 
 	which is what we'd expect. In order to make the figure readable, we leave out our dual labeling 
-	on edges that are not in the cut (their label is ``0'' anyways). The label on edges in the cut is 
-	``1'', are shown in the figure. Note that our dual labeling of edges and vertices in this flow 
+	on edges that are not in the cut (their label is ``0'' anyways). Edges in the cut have label 
+	``1'', as shown in the figure. Note that our dual labeling of edges and vertices in this flow 
 	network satisfies our dual constraints.
 
 	Thus, we have given an alternative formulation of the max-flow min-cut relationship using 

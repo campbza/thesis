@@ -5,8 +5,8 @@
 \contentsline {chapter}{Chapter 2: Vertex Cover and Duality Theory}{11}
 \contentsline {section}{\numberline {2.1}The Vertex Cover Problem}{11}
 \contentsline {section}{\numberline {2.2}Duality Theory}{14}
-\contentsline {subsection}{\numberline {2.2.1}Maximum-Matching Duality}{16}
-\contentsline {subsection}{\numberline {2.2.2}The Max-Flow Min-Cut Theorem}{18}
+\contentsline {subsection}{\numberline {2.2.1}Maximum-Matching Duality}{17}
+\contentsline {subsection}{\numberline {2.2.2}The Max-Flow Min-Cut Theorem}{19}
 \contentsline {chapter}{Chapter 3: The Hungarian Algorithm}{25}
 \contentsline {section}{\numberline {3.1}Preliminaries}{25}
 \contentsline {section}{\numberline {3.2}The Hungarian Algorithm}{29}
@@ -15,6 +15,6 @@
 \contentsline {section}{\numberline {4.2}The Primal-Dual Method for Weighted Matchings}{39}
 \contentsline {section}{\numberline {4.3}Auction Algorithms}{42}
 \contentsline {subsection}{\numberline {4.3.1}The Naive Algorithm}{44}
-\contentsline {subsection}{\numberline {4.3.2}The Auction Algorithm}{45}
-\contentsline {section}{\numberline {4.4}Concluding Remarks}{47}
+\contentsline {subsection}{\numberline {4.3.2}The Auction Algorithm}{46}
+\contentsline {section}{\numberline {4.4}Concluding Remarks}{48}
 \contentsline {chapter}{References}{49}

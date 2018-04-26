@@ -1,7 +1,7 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{Bertsekas1992}
-Dimitri~P. Bertsekas.
+D.~P. Bertsekas.
 \newblock Auction algorithms for network flow problems: A tutorial
   introduction.
 \newblock {\em Computational Optimization and Applications}, 1(1):7--66, Oct
@@ -14,17 +14,32 @@ D.~Bertsimas and J.N. Tsitsiklis.
   Athena Scientific, 1997.
 
 \bibitem{birkhoff1946}
-Garrett Birkhoff.
+G.~Birkhoff.
 \newblock Tres observaciones sobre el algebra lineal.
 \newblock {\em Univ. Nac. Tucuman Rev. Ser. A}, 5:147--151, 1946.
+
+\bibitem{bondy76}
+J.A. Bondy and U.S.R. Murty.
+\newblock {\em Graph Theory with Applications}.
+\newblock Elsevier Publishing, 1976.
 
 \bibitem{cormen2009introduction}
 T.H. Cormen, C.E. Leiserson, R.L. Rivest, and C.~Stein.
 \newblock {\em Introduction to Algorithms}.
 \newblock MIT Press, 2009.
 
+\bibitem{demange1986multi}
+G.~Demange, D.~Gale, and M.~Sotomayor.
+\newblock Multi-item auctions.
+\newblock {\em Journal of Political Economy}, 94(4):863--872, 1986.
+
+\bibitem{hknotes}
+M.~Golin.
+\newblock Bipartite matching & the hungarian method.
+\newblock \url{http://www.cse.ust.hk/~golin/COMP572/Notes/Matching.pdf}.
+
 \bibitem{Hochbaum97}
-Dorit~S. Hochbaum, editor.
+D.~S. Hochbaum, editor.
 \newblock {\em Approximation Algorithms for NP-hard Problems}.
 \newblock PWS Publishing Co., Boston, MA, USA, 1997.
 
@@ -32,6 +47,11 @@ Dorit~S. Hochbaum, editor.
 E.L. Lawler.
 \newblock {\em Combinatorial Optimization: Networks and Matroids}.
 \newblock Dover Books on Mathematics Series. Dover Publications, 1976.
+
+\bibitem{turinghand}
+N.~Nisan.
+\newblock Auction algorithm for bipartite matching.
+\newblock \url{https://agtb.wordpress.com/author/algorithmicgametheory/}.
 
 \bibitem{papadimitriou2013combinatorial}
 C.H. Papadimitriou and K.~Steiglitz.
