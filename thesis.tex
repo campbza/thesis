@@ -35,11 +35,6 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{lemma}[theorem]{Lemma}
 
-% Comment out the natbib line above and uncomment the following two lines to use the new 
-% biblatex-chicago style, for Chicago A. Also make some changes at the end where the 
-% bibliography is included. 
-%\usepackage{biblatex-chicago}
-
 
 \title{The Hungarian Algorithm and the Primal-Dual Method}
 \author{Zachary Sean Campbell}
@@ -57,16 +52,16 @@
     \pagestyle{empty} % this removes page numbers from the frontmatter
 
 \chapter*{Acknowledgements}
-Accomplishments are not made in a vacuum. I have received a significant amount of help along the way 
+Accomplishments are not made in isolation. I have received a significant amount of help along the way 
 from many people, too many to list and give due credit. I use this page to thank all of you now. 
 I most definitely would not have gotten this far without those of you who have supported me. Thank you.
 
 \tableofcontents
 \chapter*{Abstract}
-This thesis serves as an exposition on the relationship between combinatorial optimization and linear 
-programming, which describes another category of optimization problems given by linear objective 
-functions and constraints. The former is often introduced to students in a course on discrete 
-mathematics or algorithms, while the latter is often reserved for upper-division algorithms courses. 
+This thesis explores the relationship between problems in combinatorial optimization 
+and those in linear programming. The former field of study is often introduced to students in an 
+introductory course on discrete mathematics or algorithms, while the latter is often reserved for 
+upper-division algorithms courses. 
 Regardless, we focus on combinatorial problems typically introduced in an algorithms course and how 
 they relate to the field of linear programming. In particular, we look at various matching problems 
 on bipartite graphs and their associated linear programs. In doing so, we explore the fruitful 
@@ -77,11 +72,9 @@ problems using theoretical results from linear programming.
 ``Deep in the human unconscious is a pervasive need for a logical universe that makes sense. But the 
 real universe is always one step beyond logic.''
 
-- Frank Herbert, \emph{Dune}.
+- Frank Herbert, \emph{Dune}
 \mainmatter % here the regular arabic numbering starts
 \pagestyle{fancyplain} % turns page numbering back on
-%The \introduction command is provided as a convenience.
-%if you want special chapter formatting, you'll probably want to avoid using it altogether
 
 \chapter*{Introduction}
         \addcontentsline{toc}{chapter}{Introduction}

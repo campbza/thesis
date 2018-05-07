@@ -11,8 +11,10 @@ the minimum weight vertex cover problems, respectively.
 	$|U| = |V|$.
 	
 	Let us remind ourselves what the primal-dual linear programs
-	motivate. We want to minimize $\sum w_{uv}$ and maximize $(\sum_u y_u + \sum_v y_v)$. Moreover, 
-	we want optimal solutions (i.e. $\sum w_{uv} = \sum_u y_u + \sum_v y_v$). For our primal, we are 
+	motivate. We want to minimize $\sum w_{uv} x_{uv}$ and 
+	maximize $(\sum_u y_u + \sum_v y_v)$. Moreover, 
+	we want optimal solutions (i.e. $\sum w_{uv} x_{uv} = \sum_u y_u + \sum_v y_v$). 
+	For our primal, we are 
 	keeping track of edge weights. For the dual, we will be keeping track of a ``labeling'' on 
 	vertices, given by the $y_u$ and $y_v$ values. We define what a labeling is now.
 	\begin{definition}
@@ -107,14 +109,15 @@ the minimum weight vertex cover problems, respectively.
 	equality subgraph (if such a matching exists), then we can find a maximum weight matching in the 
 	graph. To do this, we will first define a few terms. 
 
+	Let $M$ be our matching on $G$.
 	As in Chapter 2, let $R$ be the set of vertices reachable from unmatched vertices in $U$ via 
-	alternating paths, 
+	$M$-alternating paths, 
 	and let $S:=R\cap U$, $T:=R\cap V$. We will use these sets to construct our collection of 
 	alternating trees.
 	
-	Now, consider a feasible labeling $l$ on a graph $G = (U,V,E)$ and set 
+	Now, consider a feasible labeling $l$ on $G$ and set 
 	\[
-		\delta := \min_{u\in S,\ v\notin T} \{l(u) + l(v) - w_{uv} \}.
+		\delta := \min_{\substack{u\in S,\ v\notin T \\ (u,v)\in E}} \{l(u) + l(v) - w_{uv} \}.
 	\]
 	We define a new labeling $l^{'}$ as follows:
 		\[
@@ -158,15 +161,20 @@ the minimum weight vertex cover problems, respectively.
 			\item If $u\in S$ and $v\notin T$ then $(u,v)\notin E_l$.
 			\item There exists some $(u,v)$ such that $u\in S$ and $v\notin T$, and 
 				$(u,v)\in E_{l^{'}}$. 
+			\item $E_l \subsetneq E_{l^{'}}$.
 		\end{enumerate}
 	\end{lemma}
 	\begin{proof}
-		The claims (1) and (2) are made clear by the previous lemma. \\
-		To prove claim (3), suppose towards a contradiction that $(u,v)\in E_l$ with 
-		$u\notin S$ and $v\in T$. This means that since $v\in T$, $u$ is reachable by some 
-		alternating path in $R$, hence $u\in S$, which is a contradiction.\\
-		Part (4) follows from the fact that if $u\in S$ and $(u,v)\in E_l$, then $v$ is 
-		reachable by an alternating path in $R$, hence $v\in T$, which is a contradiction.\\
+		Claim (6) will follow from proving the other claims.
+		Claims (1) and (2) are made clear by the previous lemma. \\
+		To prove claim (3), we suppose $(u,v)\in E_l$ (towards a contradiction), and consider 
+		the two possible cases: (a) is that $(u,v)\in M$, and (b) is that 
+		$(u,v)\notin M$. If it is the case that (a) holds, then note that since $v\in T$ we 
+		know that $u$ is reachable by some alternating path in $R$. This means $u\in S$, which 
+		is a contradiction. If it is the case that (b) holds, 
+		simply note that $u\in S$ is free, meaning it is the 
+		root of some alternating tree. This means it must be in $S$, which is a contradiction. \\
+		Part (4) follows from a similar argument to that of (3).\\
 		To see (5), note that there is some edge $(u,v)$ with 
 		$u\in S$, $v\notin T$ such that $\delta = l(u) + l(v) - w_{uv}$, so when we take 
 		$l\' (u) = l(u) - \delta$ and $l\' (v) = l(v)$, we get 
@@ -196,10 +204,10 @@ the minimum weight vertex cover problems, respectively.
 		\begin{minipage}{3in}
 			\begin{codebox}
 				\Procname{$\proc{Hungarian-Max-Assign} (U,V,E,w)$}
-				\li $l_u := \max_{v} c_{uv}$
+				\li $l_u := \max_{v} w_{uv}$
 				\li $l_v := 0$
 				\li Repeat the following:
-				\li \quad $M := $ $\proc{Max-Card-Matching} (U,V,G_l)$
+				\li \quad $M := $ $\proc{Max-Card-Matching} (U,V,E_l)$
 				\li \quad \If $M$ is a perfect matching in $G_l$
 				\li \quad	\Then 
 				    \quad		\Return $M$
@@ -212,8 +220,13 @@ the minimum weight vertex cover problems, respectively.
 		\caption{The Hungarian Algorithm}
 	\end{figure}
 
-	The correctness of the algorithm follows from the lemma and theorem. Note that our labeling $l$ 
-	remains feasible by Lemma 3.4, and the equality graph increases in size by Lemma 3.5. This tells 
+	Line 4 of the algorithm searches for a maximum-cardinality matching in our equality subgraph. 
+	Line 7 builds our collection of vertices reachable from unmatched vertices in $U$, and line 
+	8 updates the labeling.
+
+	The correctness of the algorithm follows from the Lemmas 3.4, 3.5, and Theorem 3.6. 
+	Note that our labeling $l$ 
+	remains feasible by Lemma 3.4 and the equality graph increases in size by Lemma 3.5. This tells 
 	us that, assuming our graph $G$ has a perfect matching, one will eventually be found by this 
 	algorithm. Since this perfect matching will be in $G_l$, Theorem 3.3 tells us that our final 
 	matching $M$ will be of maximum weight.
@@ -262,14 +275,14 @@ the minimum weight vertex cover problems, respectively.
 		matching}
 	\end{figure}
 	Our initial matching is $M = \{(\mbox{B},\mbox{E}), (\mbox{C},\mbox{D})\}$ (see Figure 3.3). 
-	Note that the current state of 
-	the graph is 
-	primal-dual feasible. This matching $M$ is not perfect in $G_l$. The unmatched vertices in $U$ 
+	This matching $M$ is not perfect in $G_l$. Initially, we have $R = \emptyset$. We will again 
+	look at the sets $S = R\cap U$ and $T = R\cap V$. The set of unmatched vertices in $U$ 
 	consists of a single member, $\mbox{A}$, meaning our algorithm chooses $\mbox{A}$ to add to $R$. 
 	So we have 
-	$S=\{\mbox{A}\}$ and $T=\{\mbox{E}\}$ since $\mbox{E}$ is reaches to $\mbox{A}$ via the single 
-	path. The vertex $\mbox{E}$ is matched, so we grow our alternating tree as follows: 
-	$R := R\cup \{\mbox{B}\} = \{\mbox{A},\mbox{B}\}$, 
+	$S=\{\mbox{A}\}$ and $T=\{\mbox{E}\}$, since $\mbox{E}$ is connected to $\mbox{A}$ in $G_l$ 
+	via the single alternating path. The vertex $\mbox{E}$ is matched, so we grow our alternating 
+	tree as follows: 
+	$S := S\cup \{\mbox{B}\} = \{\mbox{A},\mbox{B}\}$, 
 	$T := T\cup \{\mbox{E}\} = \{\mbox{E}\}$. At this point we adjust our labeling.
 	Calculate $\delta = \min _{u\in S,v\notin T} \{l(u) + l(v) - w_{uv}\} = 2$ from edge 
 	$(\mbox{B},\mbox{F})$. 

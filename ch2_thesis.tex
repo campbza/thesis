@@ -203,7 +203,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		Let the \emph{primal linear program} be the following linear program.
 		\begin{alignat}{3}
 			& \text{maximize } & \sum_{i=1}^{n} c_{i} x_{i}& \\
-			& \text{subject to } \quad & \sum_{i=1}^{n} a_{ij} x_{i} & \leq b_{i}, & j & 
+			& \text{subject to } \quad & \sum_{i=1}^{n} a_{ij} x_{i} & \leq b_{j}, & j & 
 			= 1, \dots , m \\
 					&& x_{i} & \geq 0, \quad & i & = 1, \dots, n.
 		\end{alignat}		
@@ -211,7 +211,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		following linear program.
 		\begin{alignat}{3}
 			& \text{minimize } & \sum_{j=1}^{m} b_{j} y_{j}& \\
-			& \text{subject to } \quad & \sum_{j=1}^{n} a_{ij} y_{j} & \geq c_{j}, & i & 
+			& \text{subject to } \quad & \sum_{j=1}^{n} a_{ij} y_{j} & \geq c_{i}, & i & 
 			= 1, \dots , m \\
 					&& y_{j} & \geq 0, \quad & j & = 1, \dots, n.
 		\end{alignat}		
@@ -223,8 +223,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	problem is actually the dual. Ultimately, it does not matter which one we call the dual and
 	which one we call the primal; what matters is how they relate to each other. 
 	Let us introduce some 
-	notation. First, let us denote the primal maximization problem by the letter $\Gamma$, and 
-	the dual minimization problem by the letter $\Omega$. For a given linear program, we denote 
+	notation. First, let us denote the primal maximization problem by $\Gamma$, and 
+	the dual minimization problem by $\Omega$. For a given linear program, we denote 
 	an optimal solution by $\mathbf{OPT}$, by which we mean the value that optimizes the objective 
 	function and satisfies the linear constraints. Naturally, we want to know how solutions to 
 	linear programs that are primal-dual to each other relate.
@@ -243,7 +243,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		So $\mathbf{OPT}(\Gamma) = \sum_{i=1}^{n} c_i x_i$ and 
 		$\mathbf{OPT}(\Omega) = \sum_{j=1}^{n} b_j y_j$.
 		Because 
-		$\mathbf{y}$ is dual feasible and all $x_i$ are nonnegative, we have 
+		$\mathbf{y}$ is dual feasible and all $x_i$ and $y_j$ are nonnegative, we have 
 		\[
 			\sum_{j=1}^{m} b_j y_j \geq \sum_{j=1}^{m}\left(\sum_{i=1}^{n} a_{ij}x_i\right) 
 			y_j.
@@ -307,7 +307,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 
 	What we have presented here is an $\emph{integer}$ linear program, since we've restricted our 
 	$x$ variables to be integers. In general, solving integer linear programs is NP-hard. However, 
-	in this case it is well known that this linear program attains integer solution at extreme points
+	in this case it is well known that this linear program attains an integer solution at extreme 
+	points
 	(see Birkhoff \cite{birkhoff1946} and von Neumann \cite{vN53})
 	of the polyhedron solution space, so we can drop the integrality requirements and just say 
 	$x_{uv} \geq 0$.
@@ -321,7 +322,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u\in U} y_u + \sum_{v\in V} y_v& \\
 		& \text{subject to } \quad & y_u + y_v & \geq 1, & \quad \text{for all } 
-					u\in U,v\in V & \\
+					(u,v)\in E & \\
 				    && y_u,y_v & \geq 0.
 	\end{alignat}
 	This dual problem tells us that each edge must be ``covered'' by at least one of its incident 
@@ -349,8 +350,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	Then the dual is given by:
 	\begin{alignat}{3}
 		& \text{minimize } & \sum_{u} y_u + \sum_v y_v& \\
-		& \text{subject to } \quad & y_u + y_v & \geq w_{uv}, & \quad \text{for all } u\in U,
-					v\in V & \\
+		& \text{subject to } \quad & y_u + y_v & \geq w_{uv}, & \quad \text{for all } 
+					(u,v)\in E & \\
 				    && y_u,y_v & \geq 0.
 	\end{alignat}
 	The dual is a sort of weighted vertex cover. One way to think about it is that each edge 
@@ -371,7 +372,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	We first recall the definition of a flow network.
 	\begin{definition}
 		A \emph{flow network} $G = (V,E)$ is a directed graph in which each edge $(u,v)\in E$ 
-		has \emph{capacity} $c_{uv} \geq 0$. Furthermore, there are two 
+		has an assigned \emph{capacity} $c_{uv} \geq 0$. Furthermore, there are two 
 		distinguished vertices in $V$, a source $s$ and a sink $t$. 
 		We assume that every $v\in V$ lies in some path $s\to \cdots \to v\to \cdots \to t$.
 	\end{definition}
@@ -414,7 +415,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		\caption{Flow network with maximum flow of 5. Notation: $X/Y$ means an edge has capacity 
 		$Y$ and flow $X$, given by the flow function.}
 	\end{figure}
-	In Figure 2.2, (from Cormen, Leiserson, Rivest, and Stein \cite{cormen2009introduction}) 
+	In Figure 2.3, (from Cormen, Leiserson, Rivest, and Stein \cite{cormen2009introduction}) 
 	we have a flow network with a corresponding flow. For example, the capacity 
 	of the edge $(s,b)$ is $3$, and our flow function in sending a flow of value $2$ through 
 	this edge.
@@ -474,10 +475,11 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 				    && d_{uv} & \geq 0, & \quad (u,v) \in E & \\
 				    && p_u,\ p_v & \geq 0.
 	\end{alignat*}
-	It is known that extreme point solutions to these linear programs take on values zerp or one at 
+	It is known that extreme point solutions to these linear programs take on values zero or one at 
 	each coordinate. Let us now consider an optimal dual solution $(\mathbf{d}^{*},\mathbf{p}^{*})$. 
-	First, in order to satisfy $p_s^{*} - p_{t}^{*} \geq 1$ with zero/one values, it must be the case 
-	that $p_s^{*} = 1$ and $p_t^{*} = 0$. This motivates an $s-t$ cut $(S,T)$ with $S$ consisting 
+	First, in order to satisfy $p_s^{*} - p_{t}^{*} \geq 1$ with zero/one values, it must 
+	be the case that $p_s^{*} = 1$ and $p_t^{*} = 0$. This motivates an $s-t$ cut $(S,T)$ 
+	with $S$ consisting 
 	of vertices with value one, and $T$ the vertices with value zero. For an edge $(u,v)$ such that 
 	$u\in S$ and $v\in T$, we have that $p_u^{*} = 1$ and $p_v^{*} = 0$, so by the first constraint 
 	$d_{uv}^{*} = 1$. This means that for any edge $(u,v)$ in the cut, the corresponding 
