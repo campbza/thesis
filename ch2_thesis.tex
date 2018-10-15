@@ -1,4 +1,5 @@
-This chapter aims to describe fundamental relationships between combinatorial optimization problems 
+This chapter aims to describe fundamental relationships between certain combinatorial optimization 
+problems 
 and linear programming. More specifically, we will define a new problem -- the vertex cover problem -- 
 and show how this problem is intimately related to the matching problem through duality theory. 
 We also use duality theory to shed light on the max-flow min-cut theorem.
@@ -16,11 +17,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		vertex cover $C$ on $G$ is a \emph{minimum vertex cover} if for any other vertex cover 
 		$C\'$ on $G$, we have that $|C|\leq |C\'|$.
 	\end{definition}
-	Using what we have already learned, we now can specify at least one relation between matchings 
-	and vertex covers: namely, the set of all vertices incident to at least one edge in any maximum 
-	matching forms a vertex cover. Figure 2.1 shows some examples of vertex covers on the 
+	Figure 2.1 shows some examples of vertex covers on the 
 	graph we looked at in the previous chapter.
-
 	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
@@ -69,7 +67,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		\caption{Examples of vertex covers.}
 	\end{figure}
 	You can convince yourself that the cover on the right is a minimum cover, i.e. there are no 
-	vertex covers on this graph of size less than three. This brings will bring us 
+	vertex covers on this graph of size less than three. This brings us 
 	to an important theorem, but we must first prove a lemma.
 
 	\begin{lemma}
@@ -96,12 +94,13 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		\emph{alternating tree} with respect to $M$ is a tree which satisfies two 
 		conditions:
 		\begin{itemize}
-			\item the tree contains exactly one node $u\in U$. We call $u$ the 
+			\item the tree contains exactly one unmatched $u\in U$. We call $u$ the 
 				\emph{root} of the tree.
 			\item all paths between the root and any other node in the tree are 
 				alternating paths.
 		\end{itemize}
 	\end{definition}
+	A graph with a corresponding alternating tree is shown in Figure 2.2.
 	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
@@ -168,7 +167,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 			F &:= \{u\in U\; |\; u \text{ unmatched}\}\\
 			R &:= \{\text{all vertices connected to vertices in $F$ by alternating paths}\}.
 		\end{align}
-		Let $S = R\cap U$ and $T = R\cap V$. Denote $N(S)$ to be the set of all vertices 
+		Let $S = R\cap U$ and $T = R\cap V$. Let $N(S)$ be the set of all vertices 
 		connected to elements of $S$ (i.e. the ``neighbors'' of $S$). Then we have the following:
 		\begin{align*}
 			&(1)\text{ Every vertex in $T$ is matched;}\\
@@ -241,7 +240,7 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		Suppose that $\mathbf{x} = (x_1, x_2,\dots,x_n)$ is a feasible solution to $\Gamma$, and 
 		$\mathbf{y} = (y_1, y_2, \dots y_m)$ is a feasible solution to $\Omega$. 
 		So $\mathbf{OPT}(\Gamma) = \sum_{i=1}^{n} c_i x_i$ and 
-		$\mathbf{OPT}(\Omega) = \sum_{j=1}^{n} b_j y_j$.
+		$\mathbf{OPT}(\Omega) = \sum_{j=1}^{m} b_j y_j$.
 		Because 
 		$\mathbf{y}$ is dual feasible and all $x_i$ and $y_j$ are nonnegative, we have 
 		\[
@@ -470,9 +469,10 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	inequalities (2.24) and (2.25), respectively. Then the dual linear program is as follows:
 	\begin{alignat*}{3}
 		& \text{minimize } & \sum_{(u,v)\in E} c_{uv} d_{uv}& \\
-		& \text{subject to } \quad & d_{uv} - p_u + p_v & \geq 0, & \quad (u,v)\in E & \\
+		& \text{subject to } \quad & d_{uv} - p_u + p_v & \geq 0, & \quad 
+					\text{for all }(u,v)\in E & \\
 				    && p_s - p_t & \geq 1, & \\
-				    && d_{uv} & \geq 0, & \quad (u,v) \in E & \\
+				    && d_{uv} & \geq 0, & \quad \text{for all }(u,v) \in E & \\
 				    && p_u,\ p_v & \geq 0.
 	\end{alignat*}
 	It is known that extreme point solutions to these linear programs take on values zero or one at 
@@ -494,9 +494,9 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 	$(S,T)$ of the flow network that has value five. 
 	Moreover, this cut $(S,T)$ should be such that $S$ consists of vertices with value one, 
 	and $T$ consists of vertices with value zero. 
-	We know that we must set $p_s = 1$ and $p_t = 0$. This gives us the following dual solution, 
-	where grey vertices are in $S$ and white vertices are in $T$:
-	\begin{figure}[H]
+	We know that we must set $p_s = 1$ and $p_t = 0$. This gives us the following dual solution 
+	shown in Figure 2.4.
+	\begin{figure}[h]
 		\centering
 		\begin{tikzpicture}[scale=.8,auto=left,every node/.style={circle,draw=black}]
 			\node [fill=black!20, label=left:{1}] (n1) at (3,3) {s};
@@ -520,7 +520,8 @@ We also use duality theory to shed light on the max-flow min-cut theorem.
 		\caption{Flow network with corresponding dual solution (bold edges are the edges in our 
 		cut).}
 	\end{figure}
-	In Figure 2.4, the $s-t$ cut corresponds to the sets $S= \{\mbox{s},\mbox{a},\mbox{b}\}$ and 
+
+	In this figure the $s-t$ cut corresponds to the sets $S= \{\mbox{s},\mbox{a},\mbox{b}\}$ and 
 	$T = \{\mbox{c},\mbox{d},\mbox{t}\}$; the 
 	edges in the cut are the bold edges $(\mbox{a},\mbox{c})$ and $(\mbox{b},\mbox{d})$. 
 	So the capacity of the cut is five, 

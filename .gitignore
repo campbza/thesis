@@ -2,8 +2,11 @@
 *.log
 *.sty
 thesis/
+thesis1/
 hungarian*
 3_39*
-TODO.txt
+*.txt
 auction.tex
 kuhn-munkres.pdf
+*.tex
+

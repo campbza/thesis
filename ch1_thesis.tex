@@ -222,7 +222,7 @@
 	we do this by noticing that 
 	$\mbox{B}$ and $\mbox{G}$ were originally unmatched, so it's okay for one of their incident 
 	edges to be 
-	added. Also, notice that the size of our matching has grown by 1! In fact, this new matching 
+	added. Also, notice that the size of our matching has grown by one! In fact, this new matching 
 	is exactly the matching given by the graph on the right in Figure 1.2. 
 	
 	This is a general technique in 
@@ -246,8 +246,9 @@
 		A matching $M$ on $G$ is a maximum matching if and only if $G$ contains no augmenting 
 		paths with respect to $M$.
 	\end{theorem}
-	This gives us the following framework for finding maximum matchings in bipartite graphs.
-	\begin{figure}
+	This gives us a framework for finding maximum matchings in bipartite graphs. The pseudocode 
+	is shown in Figure 1.5.
+	\begin{figure}[h]
 	\begin{center}
 		\begin{minipage}{3in}
 		\begin{codebox}
@@ -263,8 +264,8 @@
 	\end{center}
 		\caption{Algorithm for maximum cardinality matching.}
 	\end{figure}
-	Students with a background in algorithms will be familiar with this framework. For a detailed 
-	treatment of the subleties of this algorithm (known as the Ford-Fulkerson-Method) see Chapter 
+	Students with a background in algorithms will be familiar with this algorithm. For a detailed 
+	treatment of the subtleties of this algorithm (known as the Ford-Fulkerson-Method) see Chapter 
 	26 of Cormen, Leiserson, Rivest, and Stein \cite{cormen2009introduction}. We will rely on 
 	this method of finding maximum cardinality matchings later on in this thesis.
 \end{section}
