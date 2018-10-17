@@ -1,9 +1,0 @@
-Meeting on 09/14
-
--algorithm for a 2-factor
--primal dual for bipartite
--hungarian algorithm
--how using flows solves bipartite matching
--unweighted bipartite matching
--see if umans has references for 2-factor
--ilp for 2-factor

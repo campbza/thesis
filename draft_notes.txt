@@ -1,4 +1,0 @@
---bottom of pg 18 talk about bottleneck
---rework chapter on page 20, move middle of paragraph to top
---move first flow figure to beginning
---second flow figure, tell what grey and white vertices mean (S,T)-cut
