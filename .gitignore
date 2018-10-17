@@ -9,4 +9,14 @@ hungarian*
 auction.tex
 kuhn-munkres.pdf
 *.tex
+APA/
+Math*
+*.bib
+ch*
+*.cls
+*.bbl
+*.blg
+*.dvi
+*.lo*
+*.toc
 
